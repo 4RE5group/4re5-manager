@@ -1,0 +1,17 @@
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\bin\Debug\net8.0-windows\4re5-manager.exe
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\bin\Debug\net8.0-windows\4re5-manager.deps.json
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\bin\Debug\net8.0-windows\4re5-manager.runtimeconfig.json
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\bin\Debug\net8.0-windows\4re5-manager.dll
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\bin\Debug\net8.0-windows\4re5-manager.pdb
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.AssemblyInfoInputs.cache
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.AssemblyInfo.cs
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.dll
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\refint\4re5-manager.dll
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.pdb
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.genruntimeconfig.cache
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\ref\4re5-manager.dll
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\bin\Debug\net8.0-windows\Newtonsoft.Json.dll
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.csproj.AssemblyReference.cache
+C:\Users\User\Documents\JULES\4re5 group\4re5-app\4re5-manager\obj\Debug\net8.0-windows\4re5-manager.csproj.CopyComplete
