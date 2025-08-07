@@ -2,8 +2,10 @@ package com.ares;
 
 import android.animation.*;
 import android.app.*;
+import android.app.Activity;
 import android.content.*;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
@@ -50,6 +52,8 @@ import android.content.pm.PackageInfo;
 
 public class MainviewActivity extends AppCompatActivity {
 	
+	private double currentViewIndex = 0;
+	
 	private LinearLayout linear1;
 	private BottomNavigationView bottomnavigation1;
 	private LinearLayout linear2;
@@ -58,6 +62,7 @@ public class MainviewActivity extends AppCompatActivity {
 	
 	private FragFragmentAdapter frag;
 	private Intent i = new Intent();
+	private SharedPreferences sp;
 	
 	@Override
 	protected void onCreate(Bundle _savedInstanceState) {
@@ -74,19 +79,54 @@ public class MainviewActivity extends AppCompatActivity {
 		viewpager1 = findViewById(R.id.viewpager1);
 		textview1 = findViewById(R.id.textview1);
 		frag = new FragFragmentAdapter(getApplicationContext(), getSupportFragmentManager());
+		sp = getSharedPreferences("data", Activity.MODE_PRIVATE);
 		
 		bottomnavigation1.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(MenuItem item) {
 				final int _itemId = item.getItemId();
-				viewpager1.setCurrentItem((int)_itemId);
+				if (!(currentViewIndex == _itemId)) {
+					viewpager1.setCurrentItem((int)_itemId);
+					currentViewIndex = _itemId;
+				}
 				return true;
+			}
+		});
+		
+		viewpager1.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int _position, float _positionOffset, int _positionOffsetPixels) {
+				
+			}
+			
+			@Override
+			public void onPageSelected(int _position) {
+				if (!(_position == currentViewIndex)) {
+					bottomnavigation1.setSelectedItemId(_position);
+					currentViewIndex = _position;
+				}
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int _scrollState) {
+				
 			}
 		});
 	}
 	
 	private void initializeLogic() {
 		overridePendingTransition(0, 0);
+		if (Build.VERSION.SDK_INT >= 23) {
+						if (checkSelfPermission(android.Manifest.permission.REQUEST_INSTALL_PACKAGES) == android.content.pm.PackageManager.PERMISSION_DENIED) {
+								requestPermissions(new String[] {android.Manifest.permission.REQUEST_INSTALL_PACKAGES}, 1000);
+						}
+						else {
+				 
+						}
+				}
+				else {
+			 
+				}
 		try{
 			/*
 bug here fragmentAdapter is tabcount
@@ -94,12 +134,12 @@ bug here fragmentAdapter is tabcount
 			frag.setTabCount(5);
 			viewpager1.setAdapter(frag);
 			bottomnavigation1.getMenu().add(0, 0, 0, "Mods").setIcon(R.drawable.ic_extension_white);
-			bottomnavigation1.getMenu().add(0, 1, 0, "4re5net").setIcon(R.drawable.default_image);
+			bottomnavigation1.getMenu().add(0, 1, 0, "4re5net").setIcon(R.drawable.ic_cloud_queue_white);
 			bottomnavigation1.getMenu().add(0, 2, 0, "Home").setIcon(R.drawable.ic_home_white);
-			bottomnavigation1.getMenu().add(0, 3, 0, "Authenticator").setIcon(R.drawable.ic_extension_white);
+			bottomnavigation1.getMenu().add(0, 3, 0, "Authenticator").setIcon(R.drawable.ic_security_white);
 			bottomnavigation1.getMenu().add(0, 4, 0, "Settings").setIcon(R.drawable.ic_settings_white);
 			viewpager1.setCurrentItem((int)2);
-			((PagerAdapter)viewpager1.getAdapter()).notifyDataSetChanged();
+			bottomnavigation1.setSelectedItemId(2);
 		}catch(Exception e){
 			SketchwareUtil.showMessage(getApplicationContext(), "Error loading UI");
 			finishAffinity();
@@ -108,6 +148,7 @@ bug here fragmentAdapter is tabcount
 		bottomnavigation1.setItemIconTintList(ColorStateList.valueOf(0xFFFFFFFF));
 		bottomnavigation1.setItemTextColor(ColorStateList.valueOf(0xFFFFFFFF));
 		textview1.setText("4re5 manager - v".concat(_getPackageVersion("com.ares")));
+		sp.edit().putString("version", _getPackageVersion("com.ares")).commit();
 	}
 	
 	public class FragFragmentAdapter extends FragmentStatePagerAdapter {

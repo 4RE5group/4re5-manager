@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
 	private LinearLayout linear1;
 	private LinearLayout linear2;
 	private TextView textDefine;
+	private TextView loginMessage;
 	private TextView md5hash;
 	private PatternLockView patternlockview1;
 	private ImageView imageview1;
@@ -67,11 +68,20 @@ public class LoginActivity extends AppCompatActivity {
 		linear1 = findViewById(R.id.linear1);
 		linear2 = findViewById(R.id.linear2);
 		textDefine = findViewById(R.id.textDefine);
+		loginMessage = findViewById(R.id.loginMessage);
 		md5hash = findViewById(R.id.md5hash);
 		patternlockview1 = findViewById(R.id.patternlockview1);
 		imageview1 = findViewById(R.id.imageview1);
 		textview1 = findViewById(R.id.textview1);
 		sp = getSharedPreferences("data", Activity.MODE_PRIVATE);
+		
+		textDefine.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View _view) {
+				
+				return true;
+			}
+		});
 		
 		patternlockview1.addPatternLockListener(new PatternLockViewListener() {
 			@Override
@@ -96,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
 					else {
 						patternlockview1.setViewMode(PatternLockView.PatternViewMode.WRONG);
 						SketchwareUtil.showMessage(getApplicationContext(), "wrong pattern, closing app");
-						finishAffinity();
+						return;
 					}
 				}
 				else {
@@ -121,8 +131,11 @@ public class LoginActivity extends AppCompatActivity {
 	private void initializeLogic() {
 		patternlockview1.setDotCount((int)3);
 		patternlockview1.setNormalStateColor(0xFF3984D4);
-		if (!sp.contains("pattern")) {
+		if (sp.contains("pattern")) {
 			textDefine.setVisibility(View.GONE);
+		}
+		else {
+			loginMessage.setVisibility(View.GONE);
 		}
 	}
 	

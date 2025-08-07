@@ -4,7 +4,9 @@ import android.Manifest;
 import android.animation.*;
 import android.app.*;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.*;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,6 +40,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener;
 import com.budiyev.android.codescanner.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -63,7 +67,9 @@ public class ModsFragmentActivity extends Fragment {
 	private boolean downloading = false;
 	
 	private ArrayList<HashMap<String, Object>> appsList = new ArrayList<>();
+	private ArrayList<String> favourites = new ArrayList<>();
 	
+	private SwipeRefreshLayout swiperefreshlayout1;
 	private LinearLayout linear2;
 	private LinearLayout linear3;
 	private TextView textview2;
@@ -77,6 +83,7 @@ public class ModsFragmentActivity extends Fragment {
 	private RequestNetwork.RequestListener _repoDownload_request_listener;
 	private Intent i = new Intent();
 	private SharedPreferences sp;
+	private AlertDialog.Builder d;
 	
 	@NonNull
 	@Override
@@ -88,6 +95,7 @@ public class ModsFragmentActivity extends Fragment {
 	}
 	
 	private void initialize(Bundle _savedInstanceState, View _view) {
+		swiperefreshlayout1 = _view.findViewById(R.id.swiperefreshlayout1);
 		linear2 = _view.findViewById(R.id.linear2);
 		linear3 = _view.findViewById(R.id.linear3);
 		textview2 = _view.findViewById(R.id.textview2);
@@ -98,6 +106,27 @@ public class ModsFragmentActivity extends Fragment {
 		imageview1 = _view.findViewById(R.id.imageview1);
 		repoDownload = new RequestNetwork((Activity) getContext());
 		sp = getContext().getSharedPreferences("sharedData", Activity.MODE_PRIVATE);
+		d = new AlertDialog.Builder(getActivity());
+		
+		swiperefreshlayout1.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				favourites = new Gson().fromJson(FileUtil.readFile(working_dir.concat("/4re5 group/mods/favourites.json")), new TypeToken<ArrayList<String>>(){}.getType());
+				((BaseAdapter)listview1.getAdapter()).notifyDataSetChanged();
+				swiperefreshlayout1.setRefreshing(false);
+			}
+		});
+		
+		gridview1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> _param1, View _param2, int _param3, long _param4) {
+				final int _position = _param3;
+				sp.edit().putString("sharedModMap", new Gson().toJson(appsList.get((int)(_position)))).commit();
+				i.setAction(Intent.ACTION_VIEW);
+				i.setClass(getContext().getApplicationContext(), ModmanagerActivity.class);
+				startActivity(i);
+			}
+		});
 		
 		listview1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -140,6 +169,10 @@ public class ModsFragmentActivity extends Fragment {
 		working_dir = FileUtil.getExternalStorageDir().concat("/4re5 group/");
 		FileUtil.makeDir(working_dir);
 		FileUtil.makeDir(working_dir.concat("mods/"));
+		if (!FileUtil.isExistFile(working_dir.concat("mods/favourites.json"))) {
+			FileUtil.writeFile(working_dir.concat("mods/favourites.json"), "[]");
+		}
+		favourites = new Gson().fromJson(FileUtil.readFile(working_dir.concat("mods/favourites.json")), new TypeToken<ArrayList<String>>(){}.getType());
 		_fetch_repo(false);
 	}
 	
@@ -152,6 +185,7 @@ public class ModsFragmentActivity extends Fragment {
 		else {
 			try{
 				appsList = new Gson().fromJson(FileUtil.readFile(working_dir.concat("mods/mods.json")), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
+				favourites = new Gson().fromJson(FileUtil.readFile(working_dir.concat("mods/favourites.json")), new TypeToken<ArrayList<String>>(){}.getType());
 				listview1.setAdapter(new Listview1Adapter(appsList));
 				gridview1.setAdapter(new Gridview1Adapter(appsList));
 				((BaseAdapter)listview1.getAdapter()).notifyDataSetChanged();
@@ -243,19 +277,6 @@ public class ModsFragmentActivity extends Fragment {
 			    // Handle the case where the context is null
 			SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occured while downloading file");
 		}
-		/*
-try{
-DownloadManager.Request request = new DownloadManager.Request(Uri.parse( _url)); 
-request.setMimeType(This.getContentResolver().getType(Uri.parse(_url))); 
-String cookies = CookieManager.getInstance().getCookie(_url); 
-request.addRequestHeader("cookie", cookies); 
-//request.addRequestHeader("User-Agent", tab.getSettings().getUserAgentString());
-request.setDestinationInExternalPublicDir(_path, _filename); 
-DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE); dm.enqueue(request);
-}catch(Exception e){
-SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occured while downloading file");
-}
-*/
 	}
 	
 	public class Gridview1Adapter extends BaseAdapter {
@@ -293,9 +314,34 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 			final ImageView imageview1 = _view.findViewById(R.id.imageview1);
 			final TextView textview1 = _view.findViewById(R.id.textview1);
 			
-			if (_data.get((int)_position).containsKey("trending")) {
+			if (favourites.contains(_data.get((int)_position).get("name").toString())) {
 				textview1.setText(_data.get((int)_position).get("name").toString());
 				imageview1.setImageBitmap(FileUtil.decodeSampleBitmapFromPath(_load_image(_data.get((int)_position).get("image").toString()), 1024, 1024));
+				linear1.setOnLongClickListener(new View.OnLongClickListener() {
+					@Override
+					public boolean onLongClick(View _view) {
+						d.setMessage("delete from favourites?");
+						d.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface _dialog, int _which) {
+								try{
+									favourites.remove((int)(_position));
+									FileUtil.writeFile(working_dir.concat("/mods/favourites.json"), new Gson().toJson(favourites));
+								}catch(Exception e){
+									SketchwareUtil.showMessage(getContext().getApplicationContext(), "could not delete favourite");
+								}
+							}
+						});
+						d.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface _dialog, int _which) {
+								
+							}
+						});
+						d.create().show();
+						return true;
+					}
+				});
 			}
 			else {
 				linear1.setVisibility(View.GONE);

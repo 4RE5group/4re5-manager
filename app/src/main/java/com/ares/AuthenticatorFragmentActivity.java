@@ -183,6 +183,44 @@ public class AuthenticatorFragmentActivity extends Fragment {
 		}
 	}
 	
+	
+	public void _extra() {
+	}
+	public String EcryptingTheTextMethod(final String _string, final String _key) {
+				try{
+			javax.crypto.SecretKey key = generateKey(_key);
+			javax.crypto.Cipher c = javax.crypto.Cipher.getInstance("AES");
+			c.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+			byte[] encVal = c.doFinal(_string.getBytes());
+			return android.util.Base64.encodeToString(encVal,android.util.Base64.DEFAULT);
+				} catch (Exception e) {
+				}
+		return "";
+		}
+	
+		public String DecryptingTheTextMethod(final String _string, final String _key) {
+				try {
+			javax.crypto.spec.SecretKeySpec key = (javax.crypto.spec.SecretKeySpec) generateKey(_key);
+			javax.crypto.Cipher c = javax.crypto.Cipher.getInstance("AES");
+			c.init(javax.crypto.Cipher.DECRYPT_MODE,key);
+			byte[] decode = android.util.Base64.decode(_string,android.util.Base64.DEFAULT);
+			byte[] decval = c.doFinal(decode);
+			return new String(decval);
+				} catch (Exception ex) {
+				}
+		return "";
+		}
+		public static javax.crypto.SecretKey generateKey(String pwd) throws Exception {
+		final java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+		byte[] b = pwd.getBytes("UTF-8");
+		digest.update(b,0,b.length);
+		byte[] key = digest.digest();
+		javax.crypto.spec.SecretKeySpec sec = new javax.crypto.spec.SecretKeySpec(key, "AES");
+		return sec;
+		}
+	{
+	}
+	
 	public class Listview1Adapter extends BaseAdapter {
 		
 		ArrayList<HashMap<String, Object>> _data;
@@ -220,8 +258,14 @@ public class AuthenticatorFragmentActivity extends Fragment {
 			final TextView textview2 = _view.findViewById(R.id.textview2);
 			
 			try{
-				textview1.setText(_data.get((int)_position).get("username").toString());
-				textview2.setText(_data.get((int)_position).get("type").toString());
+				textview1.setText(DecryptingTheTextMethod(_data.get((int)_position).get("username").toString(),sp.getString("pattern", "")));
+				textview2.setText(DecryptingTheTextMethod(_data.get((int)_position).get("type").toString(),sp.getString("pattern", "")));
+				if (DecryptingTheTextMethod(_data.get((int)_position).get("type").toString(),sp.getString("pattern", "")).equals("4re5net")) {
+					imageview1.setImageResource(R.drawable.icon1_1);
+				}
+				else {
+					imageview1.setImageResource(R.drawable.ic_security_white);
+				}
 			}catch(Exception e){
 				SketchwareUtil.showMessage(getContext().getApplicationContext(), "could not display stored accounts, try cleaning app data");
 			}

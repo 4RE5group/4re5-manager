@@ -41,7 +41,15 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding="8dp"
-			android:text="define a pattern to access the app later"
+			android:text="Welcome to 4re5 manager, first define a pattern to secure your personal data"
+			android:textSize="14sp"
+			android:textColor="#798CA3" />
+		<TextView
+			android:id="@+id/loginMessage"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="Login using your pattern lock"
 			android:textSize="14sp"
 			android:textColor="#798CA3" />
 		<TextView

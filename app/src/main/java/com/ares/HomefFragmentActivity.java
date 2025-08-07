@@ -56,6 +56,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.FileProvider;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
 
@@ -70,6 +71,7 @@ public class HomefFragmentActivity extends Fragment {
 	private String tmp = "";
 	private  BottomSheetBehavior bottomSheetBehavior;
 	private HashMap<String, Object> platformAndroid = new HashMap<>();
+	private double j = 0;
 	
 	private ArrayList<HashMap<String, Object>> appsList = new ArrayList<>();
 	private ArrayList<HashMap<String, Object>> tmpListMap = new ArrayList<>();
@@ -77,6 +79,8 @@ public class HomefFragmentActivity extends Fragment {
 	private CoordinatorLayout linear2;
 	private SwipeRefreshLayout swiperefreshlayout1;
 	private LinearLayout sheetlayout;
+	private LinearLayout linear10;
+	private TextView textview1;
 	private GridView gridview1;
 	private LinearLayout indicator;
 	private LinearLayout linear3;
@@ -86,16 +90,26 @@ public class HomefFragmentActivity extends Fragment {
 	private TextView appname;
 	private TextView appdesc;
 	private LinearLayout linear9;
+	private LinearLayout linear11;
 	private TextView installbtn;
 	private TextView uninstallbtn;
 	private TextView appkeywords;
 	private TextView appversion;
+	private LinearLayout linear13;
+	private LinearLayout linear12;
+	private TextView textview3;
+	private TextView author;
+	private LinearLayout linear15;
+	private ImageView github;
+	private TextView textview4;
+	private TextView liscence;
 	
 	private Intent i = new Intent();
 	private RequestNetwork repoDownload;
 	private RequestNetwork.RequestListener _repoDownload_request_listener;
 	private TimerTask t;
 	private Vibrator v;
+	private Intent intent = new Intent();
 	
 	@NonNull
 	@Override
@@ -110,6 +124,8 @@ public class HomefFragmentActivity extends Fragment {
 		linear2 = _view.findViewById(R.id.linear2);
 		swiperefreshlayout1 = _view.findViewById(R.id.swiperefreshlayout1);
 		sheetlayout = _view.findViewById(R.id.sheetlayout);
+		linear10 = _view.findViewById(R.id.linear10);
+		textview1 = _view.findViewById(R.id.textview1);
 		gridview1 = _view.findViewById(R.id.gridview1);
 		indicator = _view.findViewById(R.id.indicator);
 		linear3 = _view.findViewById(R.id.linear3);
@@ -119,10 +135,19 @@ public class HomefFragmentActivity extends Fragment {
 		appname = _view.findViewById(R.id.appname);
 		appdesc = _view.findViewById(R.id.appdesc);
 		linear9 = _view.findViewById(R.id.linear9);
+		linear11 = _view.findViewById(R.id.linear11);
 		installbtn = _view.findViewById(R.id.installbtn);
 		uninstallbtn = _view.findViewById(R.id.uninstallbtn);
 		appkeywords = _view.findViewById(R.id.appkeywords);
 		appversion = _view.findViewById(R.id.appversion);
+		linear13 = _view.findViewById(R.id.linear13);
+		linear12 = _view.findViewById(R.id.linear12);
+		textview3 = _view.findViewById(R.id.textview3);
+		author = _view.findViewById(R.id.author);
+		linear15 = _view.findViewById(R.id.linear15);
+		github = _view.findViewById(R.id.github);
+		textview4 = _view.findViewById(R.id.textview4);
+		liscence = _view.findViewById(R.id.liscence);
 		repoDownload = new RequestNetwork((Activity) getContext());
 		v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
 		
@@ -148,28 +173,38 @@ public class HomefFragmentActivity extends Fragment {
 				else {
 					tmpListMap.clear();
 					try{
-						tmpListMap = new Gson().fromJson(_json_parser(appsList.get((int)currentpos).get("platform").toString()), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
-						for (int i = 0; i < (int)(tmpListMap.size()); i++) {
-							if (tmpListMap.get((int)i).get("name").toString().contains("Android")) {
-								platformAndroid = new HashMap<>();
-								platformAndroid = tmpListMap.get((int)i);
-								if (installbtn.getText().toString().equals("install")) {
-									_download_file(platformAndroid.get("url").toString(), "/4re5 group/tmp/", appsList.get((int)currentpos).get("name").toString().concat(".apk"));
-									_Install(working_dir.concat("tmp/".concat(appsList.get((int)currentpos).get("name").toString().concat(".apk"))));
-									if (!_getPackageVersion(appsList.get((int)currentpos).get("package").toString()).equals("none")) {
-										installbtn.setText("launch");
-										uninstallbtn.setVisibility(View.VISIBLE);
+						 
+					}catch(Exception e){
+						SketchwareUtil.showMessage(getContext().getApplicationContext(), "error in json repository");
+					}
+					tmpListMap = new Gson().fromJson(_json_parser(appsList.get((int)currentpos).get("platform").toString()), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
+					for (int i = 0; i < (int)(tmpListMap.size()); i++) {
+						if (tmpListMap.get((int)i).get("name").toString().contains("Android")) {
+							platformAndroid = new HashMap<>();
+							platformAndroid = tmpListMap.get((int)i);
+							if (installbtn.getText().toString().equals("install")) {
+								_download_file(platformAndroid.get("url").toString(), "/4re5 group/tmp/", appsList.get((int)currentpos).get("name").toString().concat(".apk"));
+								_Install(working_dir.concat("tmp/".concat(appsList.get((int)currentpos).get("name").toString().concat(".apk"))));
+								if (!_getPackageVersion(appsList.get((int)currentpos).get("package").toString()).equals("none")) {
+									installbtn.setText("launch");
+									uninstallbtn.setVisibility(View.VISIBLE);
+								}
+							}
+							else {
+								if (installbtn.getText().toString().equals("launch")) {
+									Intent launchIntent = getActivity().getPackageManager().getLaunchIntentForPackage(appsList.get((int)currentpos).get("package").toString());
+									if (launchIntent != null) {
+										    startActivity(launchIntent);
+									} else {
+										    // Handle the case where the app is not installed
+										    SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occurred while updating package");
 									}
 								}
 								else {
-									if (installbtn.getText().toString().equals("launch")) {
-										/*
-try{
-Intent launchIntent = getPackageManager().getLaunchIntentForPackage(appsList.get((int)currentpos).get("package").toString());  { startActivity(launchIntent);}
-}catch(Exception e){
-SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occurred while launching package");
-}
-*/
+									if (installbtn.getText().toString().contains("buy")) {
+										intent.setAction(Intent.ACTION_VIEW);
+										intent.setData(Uri.parse("https://4re5group.github.io/products.html"));
+										startActivity(intent);
 									}
 									else {
 										SketchwareUtil.showMessage(getContext().getApplicationContext(), "Updating...");
@@ -181,11 +216,9 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 										}
 									}
 								}
-								platformAndroid.clear();
 							}
+							platformAndroid.clear();
 						}
-					}catch(Exception e){
-						SketchwareUtil.showMessage(getContext().getApplicationContext(), "error in json repository");
 					}
 				}
 			}
@@ -202,6 +235,24 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 			}
 		});
 		
+		author.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View _view) {
+				i.setAction(Intent.ACTION_VIEW);
+				i.setData(Uri.parse("https://github.com/".concat(appsList.get((int)currentpos).get("author").toString().replace(" ", ""))));
+				startActivity(i);
+			}
+		});
+		
+		github.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View _view) {
+				i.setAction(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(appsList.get((int)currentpos).get("github").toString()));
+				startActivity(i);
+			}
+		});
+		
 		_repoDownload_request_listener = new RequestNetwork.RequestListener() {
 			@Override
 			public void onResponse(String _param1, String _param2, HashMap<String, Object> _param3) {
@@ -211,10 +262,24 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 				try{
 					FileUtil.writeFile(working_dir.concat("repo.json"), _response);
 					appsList = new Gson().fromJson(_response, new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
-					gridview1.setAdapter(new Gridview1Adapter(appsList));
 				}catch(Exception e){
 					SketchwareUtil.showMessage(getContext().getApplicationContext(), "could not download repositiory");
 				}
+				j = 0;
+				while(j < appsList.size()) {
+					if (appsList.get((int)j).containsKey("disabled")) {
+						if (appsList.get((int)j).get("disabled").toString().equals("true")) {
+							appsList.remove((int)(j));
+						}
+						else {
+							j++;
+						}
+					}
+					else {
+						j++;
+					}
+				}
+				gridview1.setAdapter(new Gridview1Adapter(appsList));
 			}
 			
 			@Override
@@ -231,7 +296,7 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 		FileUtil.makeDir(working_dir);
 		downloading = false;
 		gridview1.setAdapter(new Gridview1Adapter(appsList));
-		gridview1.setNumColumns((int)4);
+		gridview1.setNumColumns((int)3);
 		gridview1.setColumnWidth((int)100);
 		gridview1.setHorizontalSpacing((int)20);
 		gridview1.setVerticalSpacing((int)10);
@@ -240,6 +305,7 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 		uninstallbtn.setVisibility(View.INVISIBLE);
 		installbtn.setVisibility(View.INVISIBLE);
 		_LayoutDesigner(sheetlayout, 40, 0, 0, 40, "#212121", 0, "#000000", 8);
+		_LayoutDesigner(author, 40, 40, 40, 40, "#ff8500", 0, "#000000", 8);
 		_LayoutDesigner(indicator, 100, 100, 100, 100, "#E0E0E0", 0, "#000000", 0);
 		_fetch_repo(false);
 		_LayoutDesigner(installbtn, 16, 16, 16, 16, "#E53935", 0, "#000000", 8);
@@ -271,10 +337,24 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 		else {
 			try{
 				appsList = new Gson().fromJson(FileUtil.readFile(working_dir.concat("repo.json")), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
-				gridview1.setAdapter(new Gridview1Adapter(appsList));
 			}catch(Exception e){
 				SketchwareUtil.showMessage(getContext().getApplicationContext(), "error in json repo");
 			}
+			j = 0;
+			while(j < appsList.size()) {
+				if (appsList.get((int)j).containsKey("disabled")) {
+					if (appsList.get((int)j).get("disabled").toString().equals("true")) {
+						appsList.remove((int)(j));
+					}
+					else {
+						j++;
+					}
+				}
+				else {
+					j++;
+				}
+			}
+			gridview1.setAdapter(new Gridview1Adapter(appsList));
 		}
 	}
 	
@@ -342,12 +422,14 @@ SketchwareUtil.showMessage(getContext().getApplicationContext(), "an error occur
 	
 	
 	public void _download_file(final String _url, final String _path, final String _filename) {
-		if (FileUtil.isExistFile(FileUtil.getExternalStorageDir().concat("/".concat(_path.concat("/".concat(_filename)))))) {
-			FileUtil.deleteFile(FileUtil.getExternalStorageDir().concat("/".concat(_path.concat("/".concat(_filename)))));
-		}
-		else {
-			
-		}
+		/*
+if (FileUtil.isExistFile(FileUtil.getExternalStorageDir().concat("/".concat(_path.concat("/".concat(_filename)))))) {
+FileUtil.deleteFile(FileUtil.getExternalStorageDir().concat("/".concat(_path.concat("/".concat(_filename)))));
+}
+else {
+
+}
+*/
 		Context context = getContext();
 		if (context != null) {
 			    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(_url));
@@ -388,6 +470,8 @@ return;
 		appname.setText(_map.get((int)_pos).get("name").toString());
 		appdesc.setText(_map.get((int)_pos).get("description").toString());
 		appkeywords.setText("first release: ".concat(_map.get((int)_pos).get("first_date").toString()));
+		liscence.setText(_map.get((int)_pos).get("license").toString());
+		author.setText(" @".replace(" ", "").concat(_map.get((int)_pos).get("author").toString()));
 		appicon.setImageBitmap(FileUtil.decodeSampleBitmapFromPath(_load_image(_map.get((int)_pos).get("image").toString()), 1024, 1024));
 		platform = new HashMap<>();
 		platform.clear();
@@ -404,11 +488,16 @@ return;
 					appversion.setText("version: ".concat(tmpListMap.get((int)i).get("version").toString()));
 					if (_getPackageVersion(appsList.get((int)currentpos).get("package").toString()).equals("none")) {
 						installbtn.setText("install");
+						_LayoutDesigner(installbtn, 16, 16, 16, 16, "#E53935", 0, "#000000", 8);
+						if (appsList.get((int)currentpos).get("price").toString().contains("€") || appsList.get((int)currentpos).get("price").toString().contains("$")) {
+							_LayoutDesigner(installbtn, 16, 16, 16, 16, "#FF8500", 0, "#000000", 8);
+							installbtn.setText("buy at ".concat(appsList.get((int)currentpos).get("price").toString()));
+						}
 						installbtn.setVisibility(View.VISIBLE);
 						uninstallbtn.setVisibility(View.GONE);
 					}
 					else {
-						if (_getPackageVersion(tmpListMap.get((int)i).get("version").toString()).equals(_getPackageVersion(appsList.get((int)currentpos).get("package").toString()))) {
+						if ((_getVersionInt(_getPackageVersion(appsList.get((int)currentpos).get("package").toString())) == _getVersionInt(tmpListMap.get((int)i).get("version").toString())) || (_getVersionInt(_getPackageVersion(appsList.get((int)currentpos).get("package").toString())) > _getVersionInt(tmpListMap.get((int)i).get("version").toString()))) {
 							installbtn.setText("launch");
 						}
 						else {
@@ -490,16 +579,47 @@ return;
 wait for file exists 
 */
 		if (FileUtil.isExistFile(_apk)) {
-			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			i.setAction(Intent.ACTION_VIEW);
-			i.setData(Uri.parse(_apk));
-			i.setType("application/vnd.android.package-archive");
-			startActivity(i);
+			Context mContext = getContext();
+			File outputFile = null;
+			//try {
+				
+				outputFile = new File(_apk);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						Uri apkUri = FileProvider.getUriForFile(mContext, "com.ares.provider", outputFile);
+						Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+						intent.setData(apkUri);
+						intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						mContext.startActivity(intent);
+				} else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N){
+						Uri apkUri = Uri.fromFile(outputFile);
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						mContext.startActivity(intent);
+				}else {
+						Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
+				}
+			//} catch (Exception e) {
+			//    Toast.makeText(mContext, "Could not install app.", Toast.LENGTH_LONG).show();
+			//}
+			
+			/*
+i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+i.setAction(Intent.ACTION_VIEW);
+i.setData(Uri.parse(_apk));
+i.setType("application/vnd.android.package-archive");
+startActivity(i);
+*/
 		}
 		else {
 			SketchwareUtil.showMessage(getContext().getApplicationContext(), "apk file not found");
 		}
+	}
+	
+	
+	public double _getVersionInt(final String _version) {
+		return (Double.parseDouble(_version.replace(" ", "").replaceFirst(".", "#").replace(".", "").replace("#", ".").replace("beta", "").replace("alpha", "").toLowerCase()));
 	}
 	
 	public class Gridview1Adapter extends BaseAdapter {
@@ -537,11 +657,6 @@ wait for file exists
 			final ImageView imageview1 = _view.findViewById(R.id.imageview1);
 			final TextView textview1 = _view.findViewById(R.id.textview1);
 			
-			if (_data.get((int)_position).containsKey("disabled")) {
-				if (_data.get((int)_position).get("disabled").toString().equals("true")) {
-					linear1.setVisibility(View.GONE);
-				}
-			}
 			imageview1.setImageBitmap(FileUtil.decodeSampleBitmapFromPath(_load_image(_data.get((int)_position).get("image").toString()), 1024, 1024));
 			textview1.setText(_data.get((int)_position).get("name").toString());
 			linear1.setOnClickListener(new View.OnClickListener() {

@@ -1,5 +1,6 @@
 package com.ares;
 
+import android.Manifest;
 import android.animation.*;
 import android.app.*;
 import android.app.Activity;
@@ -7,6 +8,7 @@ import android.content.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
@@ -33,6 +35,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.*;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -54,13 +58,16 @@ public class ModmanagerActivity extends AppCompatActivity {
 	private double pid = 0;
 	private String procName = "";
 	private boolean flag = false;
+	private HashMap<String, Object> selectedproc = new HashMap<>();
 	
 	private ArrayList<HashMap<String, Object>> options = new ArrayList<>();
+	private ArrayList<String> favourites = new ArrayList<>();
 	
 	private LinearLayout linear1;
 	private LinearLayout linear2;
 	private ImageView imageview1;
 	private TextView textview1;
+	private ImageView imageview2;
 	private LinearLayout linear3;
 	private ListView listview1;
 	private ImageView selectedAppIcon;
@@ -78,7 +85,21 @@ public class ModmanagerActivity extends AppCompatActivity {
 		super.onCreate(_savedInstanceState);
 		setContentView(R.layout.modmanager);
 		initialize(_savedInstanceState);
-		initializeLogic();
+		
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+		|| ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+			ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
+		} else {
+			initializeLogic();
+		}
+	}
+	
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (requestCode == 1000) {
+			initializeLogic();
+		}
 	}
 	
 	private void initialize(Bundle _savedInstanceState) {
@@ -86,6 +107,7 @@ public class ModmanagerActivity extends AppCompatActivity {
 		linear2 = findViewById(R.id.linear2);
 		imageview1 = findViewById(R.id.imageview1);
 		textview1 = findViewById(R.id.textview1);
+		imageview2 = findViewById(R.id.imageview2);
 		linear3 = findViewById(R.id.linear3);
 		listview1 = findViewById(R.id.listview1);
 		selectedAppIcon = findViewById(R.id.selectedAppIcon);
@@ -100,6 +122,22 @@ public class ModmanagerActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View _view) {
 				finish();
+			}
+		});
+		
+		imageview2.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View _view) {
+				v.vibrate((long)(30));
+				if (favourites.contains(map.get("name").toString())) {
+					favourites.remove((int)(favourites.indexOf(map.get("name").toString())));
+					imageview2.setImageResource(R.drawable.ic_favorite_outline_white);
+				}
+				else {
+					favourites.add(map.get("name").toString());
+					imageview2.setImageResource(R.drawable.ic_favorite_white);
+				}
+				FileUtil.writeFile(FileUtil.getExternalStorageDir().concat("/4re5 group/mods/favourites.json"), new Gson().toJson(favourites));
 			}
 		});
 		
@@ -122,6 +160,7 @@ public class ModmanagerActivity extends AppCompatActivity {
 			sp.edit().remove("returnValue").commit();
 		}
 		map = new HashMap<>();
+		SketchwareUtil.showMessage(getApplicationContext(), "This feature is still under development");
 		try{
 			if (sp.contains("sharedModMap")) {
 				listview1.setAdapter(new Listview1Adapter(options));
@@ -129,6 +168,10 @@ public class ModmanagerActivity extends AppCompatActivity {
 				options = new Gson().fromJson(new Gson().toJson((ArrayList<HashMap<String,Object>>)map.get("options")), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
 				textview1.setText(map.get("name").toString());
 				listview1.setAdapter(new Listview1Adapter(options));
+				favourites = new Gson().fromJson(FileUtil.readFile(FileUtil.getExternalStorageDir().concat("/4re5 group/mods/favourites.json")), new TypeToken<ArrayList<String>>(){}.getType());
+				if (favourites.contains(map.get("name").toString())) {
+					imageview2.setImageResource(R.drawable.ic_favorite_white);
+				}
 			}
 			else {
 				SketchwareUtil.showMessage(getApplicationContext(), "no passed json data... finishing");
@@ -167,6 +210,27 @@ public class ModmanagerActivity extends AppCompatActivity {
 		
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (sp.contains("returnValue")) {
+			try{
+				selectedproc = new Gson().fromJson(sp.getString("returnValue", ""), new TypeToken<HashMap<String, Object>>(){}.getType());
+				SelectedAppName.setText(selectedproc.get("name").toString());
+				selectedAppPid.setText(selectedproc.get("pid").toString());
+				sp.edit().remove("returnValue").commit();
+				try{
+					Drawable app_icon = getPackageManager().getApplicationIcon(selectedproc.get("name").toString());
+					
+					selectedAppIcon.setImageDrawable(app_icon);
+				}catch(Exception e){
+					 
+				}
+			}catch(Exception e){
+				SketchwareUtil.showMessage(getApplicationContext(), "invalid selected process");
+			}
+		}
+	}
 	public void _callSetValue(final String _offset, final String _value, final double _pid) {
 		
 	}
@@ -445,6 +509,13 @@ public class ModmanagerActivity extends AppCompatActivity {
 						}catch(Exception e){
 							 
 						}
+						isRange.setOnTouchListener(new View.OnTouchListener(){
+							@Override
+							public boolean onTouch(View _view, MotionEvent _motionEvent){
+								rangeValue.setText(String.valueOf((long)(isRange.getProgress())));
+								return true;
+							}
+						});
 					}
 					else {
 						labelType.setVisibility(View.VISIBLE);
