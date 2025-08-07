@@ -65,6 +65,7 @@ public class AddaccActivity extends AppCompatActivity {
 	private String url = "";
 	private String token = "";
 	private String type = "";
+	private String atChar = "";
 	
 	private ArrayList<HashMap<String, Object>> accounts = new ArrayList<>();
 	private ArrayList<String> tmp = new ArrayList<>();
@@ -150,10 +151,10 @@ public class AddaccActivity extends AppCompatActivity {
 			public void onClick(View _view) {
 				accounts = new Gson().fromJson(sp.getString("accounts", ""), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
 				map = new HashMap<>();
-				map.put("username", edittext1.getText().toString());
-				map.put("token", token);
-				map.put("url", url);
-				map.put("type", type);
+				map.put("username", EcryptingTheTextMethod(edittext1.getText().toString(),sp.getString("pattern", "")));
+				map.put("token", EcryptingTheTextMethod(token,sp.getString("pattern", "")));
+				map.put("url", EcryptingTheTextMethod(url,sp.getString("pattern", "")));
+				map.put("type", EcryptingTheTextMethod(type,sp.getString("pattern", "")));
 				accounts.add(map);
 				SketchwareUtil.showMessage(getApplicationContext(), "added account successfully!");
 				sp.edit().putString("accounts", new Gson().toJson(accounts)).commit();
@@ -192,10 +193,14 @@ public class AddaccActivity extends AppCompatActivity {
 	
 	private String _data ="";
 	private void QRCodeScan(){
-		   try{
-			if (_data.contains("¤")) {
+		   /*
+ @ is always after a space bug
+*/
+		atChar = " @".replace(" ", "");
+		try{
+			if (_data.contains(atChar)) {
 				v.vibrate((long)(30));
-				tmp = new ArrayList<String>(Arrays.asList(_data.split("¤")));
+				tmp = new ArrayList<String>(Arrays.asList(_data.split(atChar)));
 				type = tmp.get((int)(0));
 				url = tmp.get((int)(1));
 				token = tmp.get((int)(2));
@@ -207,8 +212,46 @@ public class AddaccActivity extends AppCompatActivity {
 			}
 		}catch(Exception e){
 			SketchwareUtil.showMessage(getApplicationContext(), "wrong qrcode. make sure it's from a 4re5 product");
+			Scan.startPreview(); 
 		}
 		  }
+	
+	public void _extra() {
+	}
+	public String EcryptingTheTextMethod(final String _string, final String _key) {
+				try{
+			javax.crypto.SecretKey key = generateKey(_key);
+			javax.crypto.Cipher c = javax.crypto.Cipher.getInstance("AES");
+			c.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+			byte[] encVal = c.doFinal(_string.getBytes());
+			return android.util.Base64.encodeToString(encVal,android.util.Base64.DEFAULT);
+				} catch (Exception e) {
+				}
+		return "";
+		}
+	
+		public String DecryptingTheTextMethod(final String _string, final String _key) {
+				try {
+			javax.crypto.spec.SecretKeySpec key = (javax.crypto.spec.SecretKeySpec) generateKey(_key);
+			javax.crypto.Cipher c = javax.crypto.Cipher.getInstance("AES");
+			c.init(javax.crypto.Cipher.DECRYPT_MODE,key);
+			byte[] decode = android.util.Base64.decode(_string,android.util.Base64.DEFAULT);
+			byte[] decval = c.doFinal(decode);
+			return new String(decval);
+				} catch (Exception ex) {
+				}
+		return "";
+		}
+		public static javax.crypto.SecretKey generateKey(String pwd) throws Exception {
+		final java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+		byte[] b = pwd.getBytes("UTF-8");
+		digest.update(b,0,b.length);
+		byte[] key = digest.digest();
+		javax.crypto.spec.SecretKeySpec sec = new javax.crypto.spec.SecretKeySpec(key, "AES");
+		return sec;
+		}
+	{
+	}
 	
 	
 	@Deprecated

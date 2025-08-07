@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 	
 	private void initializeLogic() {
+		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 		
 		if (Build.VERSION.SDK_INT >= 23) {
 						if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_DENIED) {

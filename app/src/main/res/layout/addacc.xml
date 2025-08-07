@@ -49,7 +49,7 @@
 		android:layout_height="wrap_content"
 		android:paddingLeft="8dp"
 		android:paddingRight="8dp"
-		android:background="#1E1E1E"
+		android:background="#202A3B"
 		android:orientation="vertical">
 		<TextView
 			android:id="@+id/accountName"
@@ -66,7 +66,7 @@
 			android:padding="8dp"
 			android:textSize="14sp"
 			android:textColor="#798CA3"
-			android:hint="account name"
+			android:hint="account description"
 			android:textColorHint="#607D8B"
 			android:imeOptions="actionSend"
 			android:layout_weight="1" />
