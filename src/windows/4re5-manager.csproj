@@ -1,35 +1,65 @@
-<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <PlatformTarget>x64</PlatformTarget>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
-    <AssemblyTitle>4re5 Manager</AssemblyTitle>
-    <AssemblyDescription>Official 4re5 app downloader and updater with security features</AssemblyDescription>
-    <AssemblyCompany>4re5 group</AssemblyCompany>
-    <AssemblyProduct>4re5 Manager</AssemblyProduct>
-    <AssemblyCopyright>Copyright 4re5 group © 2025</AssemblyCopyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+<Project ToolsVersion="v4.0.30319" Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <Optimize>yes</Optimize>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <SelfContained>true</SelfContained>
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishTrimmed>false</PublishTrimmed>
-  </PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <PlatformTarget>anycpu</PlatformTarget>
+        <DisableWinExeOutputInference>True</DisableWinExeOutputInference>
+        <UseWindowsForms>true</UseWindowsForms>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        
+        <PackageId>com.ares</PackageId>
+        <Product>4re5 Manager</Product>
 
-  <ItemGroup>
-    <Content Include="icon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="app.manifest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+        <AssemblyTitle>4re5 Manager</AssemblyTitle>
+        <AssemblyName>4re5-manager</AssemblyName>
+        <AssemblyProduct>4re5 Manager</AssemblyProduct>
+        <AssemblyDescription>Official 4re5 app downloader and updater with security features</AssemblyDescription>
+        
+        <AssemblyCompany>4re5 group</AssemblyCompany>
+        <Authors>4re5 group</Authors>
+        
+        <PackageProjectUrl>https://4re5group.github.io</PackageProjectUrl>
+        <RepositoryType>GitHub</RepositoryType>
+        <RepositoryUrl>https://github.com/4re5group/4re5-manager</RepositoryUrl>
+        
+        
+        
+        <AssemblyCopyright>Copyright 4re5 group © 2025</AssemblyCopyright>
+        <Copyright>Copyright 4re5 group © 2025</Copyright>
+        
+        <Configuration>Release</Configuration>
+        
+        <AssemblyVersion>1.8 beta</AssemblyVersion>
+        <FileVersion>1.8 beta</FileVersion>
+        <Version>1.8-beta</Version>
+        <NeutralLanguage>en-US</NeutralLanguage>
+
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>icon.ico</ApplicationIcon>
+
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <SelfContained>true</SelfContained>
+        <PublishSingleFile>true</PublishSingleFile>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishTrimmed>false</PublishTrimmed>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <CSFile Include = "**/*.cs"/>
+    </ItemGroup>
+	<Target Name = "Compile">
+        <CSC Sources = "@(CSFile)"
+            DebugType="$(DebugType)"
+			TargetType="exe"
+            Optimize="$(Optimize)"
+			Win32Icon="$(ApplicationIcon)"
+			References=""
+			Resources=""
+            OutputAssembly="4re5-manager-v$(Version)_$(Configuration).exe" >
+            <Output TaskParameter="OutputAssembly"
+                ItemName = "EXEFile" />
+        </CSC>
+    </Target>
 </Project>
