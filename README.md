@@ -38,4 +38,9 @@ Keep track of lastest softwares updates with ease with **4re5 manager**
 
 
 <br><br>
+
+## Todo list
+- [ ] Implement Windows version 
+- [ ] Implement Linux version
+
 Made with ♥ by 4re5 group
