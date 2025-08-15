@@ -1,0 +1,69 @@
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+	<LinearLayout
+		android:id="@+id/linear1"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:padding="8dp"
+		android:background="#000000"
+		android:gravity="center_horizontal|center_vertical"
+		android:orientation="vertical">
+		<LinearLayout
+			android:id="@+id/linear2"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:gravity="center_horizontal|center_vertical"
+			android:orientation="horizontal">
+			<ImageView
+				android:id="@+id/imageview1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/icon_1"
+				android:scaleType="center" />
+			<TextView
+				android:id="@+id/textview1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="20dp"
+				android:padding="8dp"
+				android:text="LOGIN"
+				android:textSize="20sp"
+				android:textColor="#798CA3" />
+		</LinearLayout>
+		<TextView
+			android:id="@+id/textDefine"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="Welcome to 4re5 manager, first define a pattern to secure your personal data"
+			android:textSize="14sp"
+			android:textColor="#798CA3" />
+		<TextView
+			android:id="@+id/loginMessage"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="Login using your pattern lock"
+			android:textSize="14sp"
+			android:textColor="#798CA3" />
+		<TextView
+			android:id="@+id/md5hash"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="-"
+			android:textSize="14sp"
+			android:textColor="#798CA3" />
+		<com.andrognito.patternlockview.PatternLockView
+			android:id="@+id/patternlockview1"
+			android:layout_width="400dp"
+			android:layout_height="400dp"
+			android:padding="8dp" />
+	</LinearLayout>
+</LinearLayout>
