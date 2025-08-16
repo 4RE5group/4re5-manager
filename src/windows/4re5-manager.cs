@@ -3,12 +3,23 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
+using System.Reflection;
 
 namespace com.ares
 {
     public partial class MainWindow : Form
     {
         private string home_path;
+
+        public static string GetEmbeddedHtml(string resourceName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
         public MainWindow()
         {
             home_path = Environment.GetEnvironmentVariable("userprofile") + @"\4re5 group\";
@@ -29,7 +40,14 @@ namespace com.ares
             webBrowser.Dock = DockStyle.Fill;
             webBrowser.Size = this.Size;
             webBrowser.ScriptErrorsSuppressed = true;
-            webBrowser.DocumentText = "<body><a href='4re5.com'>Hello World from 4re5 manager on windows</a></body>";
+            var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            foreach (var name in names)
+            {
+                Console.WriteLine(name);
+            }
+
+            string mainContent = GetEmbeddedHtml("main.html");
+            webBrowser.DocumentText = mainContent;
             this.Controls.Add(webBrowser);
         }
 

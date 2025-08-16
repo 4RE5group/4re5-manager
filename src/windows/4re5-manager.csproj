@@ -47,19 +47,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <CSFile Include = "**/*.cs"/>
+        <CSFile Include="*.cs"/>
+        <!-- <EmbeddedResource Include="app\main.html" /> -->
     </ItemGroup>
-	<Target Name = "Compile">
-        <CSC Sources = "@(CSFile)"
+	<Target Name="Compile">
+        <CSC Sources="@(CSFile)"
             DebugType="$(DebugType)"
-			TargetType="exe"
+			TargetType="Exe"
             Optimize="$(Optimize)"
 			Win32Icon="$(ApplicationIcon)"
 			References=""
-			Resources=""
-            OutputAssembly="4re5-manager-v$(Version)_$(Configuration).exe" >
-            <Output TaskParameter="OutputAssembly"
-                ItemName = "EXEFile" />
+			Resources="app\main.html"
+            OutputAssembly="4re5-manager.exe">
+            <Output TaskParameter="OutputAssembly" ItemName="EXEFile" />
         </CSC>
     </Target>
 </Project>
