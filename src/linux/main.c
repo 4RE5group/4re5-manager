@@ -1,88 +1,70 @@
-#include <unistd.h>
-#include <stdarg.h>
-#include <string.h>
+#include "defs.h"
 
+// repo informations
+#define APP_DIR		"%s/.4re5 group/"
+#define REPO_PATH	"%s/.4re5 group/repo.json"
+#define REPO_URL	"https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/repo.json"
 
-#define COLOR_BLACK	"\e[30m"
-#define COLOR_RED	"\e[31m"
-#define COLOR_GREEN	"\e[32m"
-#define COLOR_YELLOW	"\e[33m"
-#define COLOR_BLUE	"\e[34m"
-#define COLOR_MAGENTA	"\e[35m"
-#define COLOR_CYAN	"\e[36m"
-#define COLOR_WHITE	"\e[37m"
-
-#define COLOR_BBLACK	"\e[90m"
-#define COLOR_BRED	"\e[91m"
-#define COLOR_BGREEN	"\e[92m"
-#define COLOR_BYELLOW	"\e[93m"
-#define COLOR_BBLUE	"\e[94m"
-#define COLOR_BMAGENTA	"\e[95m"
-#define COLOR_BCYAN	"\e[96m"
-#define COLOR_BWHITE	"\e[97m"
-
-#define COLOR_RESET "\e[0m"
-
-int	count_occurences(char *str, char *charset)
+void	check_repo(short force_updating)
 {
-	size_t	i;
-	int	count;
-	short	j;
+	int	status;
+	char	APP_DIR_PARSED[512];
+	char	REPO_PATH_PARSED[512];
+	const char	*home_dir;
 
-	i = 0;
-	count = 0;
-	while (i < strlen(str))
+	home_dir = (const char *)0;
+	// check if repo json file exists
+	if (access(REPO_PATH, F_OK) == -1)
+		force_updating = 1;
+
+	if (force_updating)
 	{
-		j = 0;
-		while (str[i + j] && charset[j] && str[i + j] == charset[j])
-			j++;
-		if (charset[j] == '\0')
-			count++;
-		i+=j + 1;
-	}
-	return (count);
-}
+		// parse file paths
+		home_dir = getenv("HOME");
+		strformat(APP_DIR, APP_DIR_PARSED, home_dir);
+		strformat(REPO_PATH, REPO_PATH_PARSED, home_dir);
 
-void	putstrf(char *str, int fd, ...)
-{
-	size_t	i;
-	int	buf_pos;
-	va_list	args;
-	int	count;
-	int	arg_pos;
-	char	buf[4096];
-	char	*current;
-
-	count = count_occurences(str, "%s");
-	arg_pos = 0;
-	va_start(args, fd); // init args to be after var fd
-	i = 0;
-	buf_pos = 0;
-	while (str[i])
-	{
-		if (arg_pos < count && strncmp(&str[i], "%s", 2) == 0)
+		status = mkdir(APP_DIR_PARSED, 0777);
+		if (status != 0 && errno != EEXIST)
 		{
-			current = va_arg(args, char *);
-			while (*current)
-				buf[buf_pos++] = *current++;
-			arg_pos++;
-			i++;
+			putstrf("%s[%sx%s] Could not fetch the repository%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
+			putstrf("Folder: '%s'\n%s\n", 2, APP_DIR_PARSED, strerror(errno));
+			return ;
 		}
-		else
-			buf[buf_pos++] = str[i];
-		i++;
+		//  repository json file
+		if (fetch_repo(REPO_URL, REPO_PATH_PARSED) == 1)
+		{
+			putstrf("%s[%sx%s] Could not download the file%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
+			return ;
+		}
+
+		putstrf("%s[%s+%s] Updated the repository successfully!%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, COLOR_YELLOW, COLOR_RESET);
+		putstrf("Repo path: %s\n", 1, REPO_PATH_PARSED);
 	}
-	write(fd, buf, buf_pos);
-	va_end(args); // clean up
 }
 
 int	main(int argc, char **argv)
 {
-	(void)argv;
 	if (argc == 1)
 	{
 		putstrf("%s[%sx%s] Invalid arguments, use --help to get list of valid arguments%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
 		return (1);
 	}
+	//  repo is it does not exist
+	check_repo(0);
+	if (strcmp(argv[1], "--help") == 0) {
+		putstrf("4re5 manager, version v%s\nUsage:  %s [option]\n        %s [option] package_name\n\n", 1, "1.8", argv[0], argv[0]);
+		putstrf("Official 4re5 app downloader & updater with 4re5 security features for authentification and more\n\n", 1);
+		putstrf("4re5 manager options:\n\
+    list\n\
+    search <query>\n\
+    install package_name\n\
+    remove package_name\n\
+    version\n\
+    update\n\
+    upgrade\n\
+More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
+	}
+	else if (strcmp(argv[1], "update") == 0)
 	return (0);
 }

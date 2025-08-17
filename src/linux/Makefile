@@ -1,16 +1,19 @@
-OUT=4re5-manager
-C=cc
-C_FLAGS=-Wall -Wextra -Werror
-C_FILES=main.c
-O_FILES=$(C_FILES:.c=.o)
+OUT = 4re5-manager
+C = gcc
+CFLAGS = -Wall -Wextra -Werror
+LDFLAGS = -lcurl -lssl -lcrypto
+C_FILES = main.c utils.c fetch_repo.c
+O_FILES = $(C_FILES:.c=.o)
 
-all: $(O_FILES)
-	$(C) $(C_FLAGS) $(C_FILES) -o $(OUT)
+all: $(OUT)
 
-run: all
-	clear && ./$(OUT)
-	
+$(OUT): $(O_FILES)
+	$(C) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(C) $(CFLAGS) -c $< -o $@
+
 clean:
 	rm -rf $(OUT) $(O_FILES)
 
-.PHONY:	all run clean
+.PHONY: all clean
