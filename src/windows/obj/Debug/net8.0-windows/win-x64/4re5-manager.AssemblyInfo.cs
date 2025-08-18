@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright 4re5 group © 2025")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.8 beta")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.8-beta+62d96d9d364ec0f006c3b2a7f04e661477b2d9ba")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.8-beta+917f81a25d9c2d93101ae32e1fb6545cff1621ea")]
 [assembly: System.Reflection.AssemblyProductAttribute("4re5 Manager")]
 [assembly: System.Reflection.AssemblyTitleAttribute("4re5 Manager")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.8 beta")]
