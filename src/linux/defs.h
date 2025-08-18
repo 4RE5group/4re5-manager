@@ -10,6 +10,8 @@
 #include <curl/curl.h>
 #include <stdlib.h>
 
+#include <jansson.h>
+
 // definitions
 #define COLOR_BLACK	"\e[30m"
 #define COLOR_RED	"\e[31m"
@@ -29,8 +31,35 @@
 #define COLOR_BCYAN	"\e[96m"
 #define COLOR_BWHITE	"\e[97m"
 
-#define COLOR_RESET "\e[0m"
+#define COLOR_RESET	"\e[0m"
 
+typedef struct platform {
+	char	*name;
+	int	platformid;
+	char	*url;
+	char	*version;
+	char	*install_requires[32];
+	short	isCmdTool;
+	char	*startUpFile;
+	short	isZipped;
+	short	isInstaller;
+} platform;
+
+typedef	struct APP_STRUCT {
+	const char		*version;
+	const char		*name;
+	const char		*description;
+	const char		*image;
+	const char		*first_date;
+	const char		*author;
+	const char		*price;
+	const char		*docs;
+	const char		*github;
+	const char		*license;
+	const char		*package;
+	short			platforms[3];
+	const char	*keywords[32];
+} APP_STRUCT;
 
 
 // utils.c

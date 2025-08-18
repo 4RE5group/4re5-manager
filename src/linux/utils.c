@@ -40,6 +40,7 @@ int	strformat(char *str, char *buf, ...)
 	va_start(args, buf);
 
 	res = strformat_va(str, buf, args);
+	buf[res] = '\0';
 	va_end(args);
 	return (res);
 }
@@ -52,7 +53,7 @@ int	strformat_va(char *str, char *buf, va_list args)
 	int	arg_pos;
 	char	*current;
 
-	count = count_occurences(str, "%s");
+	count = count_occurences(str, "%s") + 1;
 	arg_pos = 0;
 	i = 0;
 	buf_pos = 0;

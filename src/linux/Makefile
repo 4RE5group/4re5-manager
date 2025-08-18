@@ -1,7 +1,7 @@
 OUT = 4re5-manager
 C = gcc
-CFLAGS = -Wall -Wextra -Werror
-LDFLAGS = -lcurl -lssl -lcrypto
+CFLAGS = -Wall -Wextra -Werror -g3
+LDFLAGS = -lcurl -lssl -lcrypto -ljansson
 C_FILES = main.c utils.c fetch_repo.c
 O_FILES = $(C_FILES:.c=.o)
 
