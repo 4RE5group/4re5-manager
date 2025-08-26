@@ -43,7 +43,9 @@ int	load_json_repo()
 	json_error_t error;
 	size_t index;
 	json_t *value;
-	//APP_STRUCT	current;
+	int	total_elements;
+	
+	total_elements = -1;
 
 	home_dir = (const char *)0;
 	// parse file paths
@@ -54,13 +56,13 @@ int	load_json_repo()
 	root = json_load_file(REPO_PATH_PARSED, 0, &error);
 	if (!root) {
 		putstrf("%s[%sx%s] An error occured while loading JSON repository \n\t=> '%s'%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, error.text, COLOR_RESET);
-		return (1);
+		return (total_elements);
 	}
 	// Check if root is an array
 	if (!json_is_array(root)) {
 		putstrf("%s[%sx%s] JSON repository is invalid, try updating it or try again later%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
 		json_decref(root);
-		return (1);
+		return (total_elements);
 	}	
 	// Iterate through the array
 	json_array_foreach(root, index, value) 
@@ -76,10 +78,11 @@ int	load_json_repo()
 			putstrf("    %sauthor: \e[48;2;255;133;0m\e[38;2;255;255;255m@%s%s\n", 1, COLOR_YELLOW, json_getkey(value, "author"), COLOR_RESET);
 			putstrf("    %sfirst release: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "first_date"), COLOR_RESET);
 			putstrf("    %sname: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "name"), COLOR_RESET);
+			total_elements++;
 		}
 	}
 	json_decref(root);
-	return (0);
+	return (total_elements);
 }
 
 
@@ -117,10 +120,6 @@ void	check_repo(short force_updating)
 		}
 		putstrf("%s[%s+%s] Updated the repository successfully!%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, COLOR_YELLOW, COLOR_RESET);
 	}
-	if(load_json_repo() == 0)
-		putstrf("Loaded!\n", 1);
-	else
-		putstrf("Loaded!\n", 1);
 }
 
 int	main(int argc, char **argv)
@@ -146,5 +145,16 @@ int	main(int argc, char **argv)
 More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 	}
 	else if (strcmp(argv[1], "update") == 0)
+		check_repo(1); // force updating repo
+	else if (strcmp(argv[1], "list") == 0)
+	{
+		int total_elem = load_json_repo(); 
+		if(total_elem != -1)
+			putstrf("%sSuccessfully displayed %i elements%s\n", 1, COLOR_YELLOW, total_elem, COLOR_RESET);
+		else
+			putstrf("%s[%sx%s] Error while loading app list%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
+	}
+	else
+		putstrf("%s[%sx%s] Invalid argument at position id:1%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
 	return (0);
 }
