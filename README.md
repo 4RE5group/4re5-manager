@@ -1,6 +1,6 @@
 # 4re5-manager
 
-Official 4re5 app downloader&amp;updater with 4re5 security features for authentification and more
+Official 4re5 app downloader &amp; updater with 4re5 security features for authentification and more
 
 ## Installation
 ### Android
