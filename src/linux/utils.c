@@ -59,11 +59,67 @@ int	strformat_va(char *str, char *buf, va_list args)
 	buf_pos = 0;
 	while (str[i])
 	{
-		if (arg_pos < count && strncmp(&str[i], "%s", 2) == 0)
+		if (arg_pos < count)
 		{
-			current = va_arg(args, char *);
-			while (*current)
-				buf[buf_pos++] = *current++;
+			if (strncmp(&str[i], "%s", 2) == 0)
+			{
+				current = va_arg(args, char *);
+				while (*current)
+					buf[buf_pos++] = *current++;
+
+			}
+			else if (strncmp(&str[i], "%i", 2) == 0)
+			{
+				int	tmp = va_arg(args, int);
+				int	tmp2 = 0;
+				int	size = 0;
+				
+				// simple itoa
+				if (tmp == 0)
+				{
+					buf[buf_pos++] = '0';
+					continue;
+				} 
+				else if (tmp == -2147483647)
+				{
+					buf[buf_pos++] = '-';
+					buf[buf_pos++] = '2';
+					buf[buf_pos++] = '1';
+					buf[buf_pos++] = '4';
+					buf[buf_pos++] = '7';
+					buf[buf_pos++] = '4';
+					buf[buf_pos++] = '8';
+					buf[buf_pos++] = '3';
+					buf[buf_pos++] = '6';
+					buf[buf_pos++] = '4';
+					buf[buf_pos++] = '7';
+					continue;
+				}
+				if (tmp < 0)
+				{
+					tmp = -tmp;
+					buf[buf_pos++] = '-';
+				}
+				tmp2 = tmp;
+				// calculate size
+				while (tmp2 > 0)
+				{
+					buf_pos++;
+					size++;
+					tmp2 /= 10;
+				}
+				while(tmp > 0)
+				{
+					buf[buf_pos--] = '0' + (tmp % 10);
+					tmp /= 10;
+				}
+				buf_pos+=size + 1;
+			}
+			else 
+			{
+				buf[buf_pos++] = str[i++];
+				continue;
+			}
 			arg_pos++;
 			i++;
 		}
