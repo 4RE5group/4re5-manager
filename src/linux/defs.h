@@ -33,39 +33,11 @@
 
 #define COLOR_RESET	"\e[0m"
 
-typedef struct platform {
-	char	*name;
-	int	platformid;
-	char	*url;
-	char	*version;
-	char	*install_requires[32];
-	short	isCmdTool;
-	char	*startUpFile;
-	short	isZipped;
-	short	isInstaller;
-} platform;
-
-typedef	struct APP_STRUCT {
-	const char		*version;
-	const char		*name;
-	const char		*description;
-	const char		*image;
-	const char		*first_date;
-	const char		*author;
-	const char		*price;
-	const char		*docs;
-	const char		*github;
-	const char		*license;
-	const char		*package;
-	short			platforms[3];
-	const char	*keywords[32];
-} APP_STRUCT;
-
-
 // utils.c
 void	putstrf(char *str, int fd, ...);
 int	strformat_va(char *str, char *buf, va_list args);
 int	strformat(char *str, char *buf, ...);
+short	contains(const char *from, const char *charset);
 
 // fetch_repo.c
 int	fetch_repo(char *url, char *output_file);

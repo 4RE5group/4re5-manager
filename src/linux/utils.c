@@ -5,14 +5,14 @@ void	putstrf(char *str, int fd, ...)
 	char	buf[4096];
 	int	buf_pos;
 	va_list args;
-    	va_start(args, fd);
+		va_start(args, fd);
 
 	buf_pos = strformat_va(str, buf, args);
 	write(fd, buf, buf_pos);
 	va_end(args);
 }
 
-int	count_occurences(char *str, char *charset)
+int	count_occurrences(char *str, char *charset)
 {
 	size_t	i;
 	int	count;
@@ -26,8 +26,12 @@ int	count_occurences(char *str, char *charset)
 		while (str[i + j] && charset[j] && str[i + j] == charset[j])
 			j++;
 		if (charset[j] == '\0')
+		{
 			count++;
-		i += j + 1;
+			i += j;
+		}
+		else
+			i++;
 	}
 	return (count);
 }
@@ -45,87 +49,76 @@ int	strformat(char *str, char *buf, ...)
 	return (res);
 }
 
-int	strformat_va(char *str, char *buf, va_list args)
-{
-	size_t	i;
-	int	buf_pos;
-	int	count;
-	int	arg_pos;
-	char	*current;
+int strformat_va(char *str, char *buf, va_list args) {
+	size_t i = 0;
+	int buf_pos = 0;
+	int arg_pos = 0;
+	int count = count_occurrences(str, "%s") + count_occurrences(str, "%i");
 
-	count = count_occurences(str, "%s") + 1;
-	arg_pos = 0;
-	i = 0;
-	buf_pos = 0;
 	while (str[i])
 	{
-		if (arg_pos < count)
+		if (arg_pos <= count && str[i] == '%' && (str[i + 1] == 's' || str[i + 1] == 'i')) 
 		{
-			if (strncmp(&str[i], "%s", 2) == 0)
+			if (strncmp(&str[i], "%s", 2) == 0) 
 			{
-				current = va_arg(args, char *);
+				char *current = va_arg(args, char *);
 				while (*current)
 					buf[buf_pos++] = *current++;
-
-			}
-			else if (strncmp(&str[i], "%i", 2) == 0)
+				i += 2;
+			} 
+			else if (strncmp(&str[i], "%i", 2) == 0) 
 			{
-				int	tmp = va_arg(args, int);
-				int	tmp2 = 0;
-				int	size = 0;
-				
-				// simple itoa
-				if (tmp == 0)
-				{
-					buf[buf_pos++] = '0';
-					continue;
-				} 
-				else if (tmp == -2147483647)
-				{
+				int tmp = va_arg(args, int);
+				char num_buf[12]; // Enough for 32-bit int
+				int num_pos = 0;
+
+				// Handle negative numbers
+				if (tmp < 0) {
 					buf[buf_pos++] = '-';
-					buf[buf_pos++] = '2';
-					buf[buf_pos++] = '1';
-					buf[buf_pos++] = '4';
-					buf[buf_pos++] = '7';
-					buf[buf_pos++] = '4';
-					buf[buf_pos++] = '8';
-					buf[buf_pos++] = '3';
-					buf[buf_pos++] = '6';
-					buf[buf_pos++] = '4';
-					buf[buf_pos++] = '7';
-					continue;
-				}
-				if (tmp < 0)
-				{
 					tmp = -tmp;
-					buf[buf_pos++] = '-';
 				}
-				tmp2 = tmp;
-				// calculate size
-				while (tmp2 > 0)
-				{
-					buf_pos++;
-					size++;
-					tmp2 /= 10;
+
+				// Handle zero
+				if (tmp == 0) {
+					buf[buf_pos++] = '0';
+					i += 2;
+					arg_pos++;
+					continue;
 				}
-				while(tmp > 0)
-				{
-					buf[buf_pos--] = '0' + (tmp % 10);
+
+				// simple itoa 
+				while (tmp > 0) {
+					num_buf[num_pos++] = '0' + (tmp % 10);
 					tmp /= 10;
 				}
-				buf_pos+=size + 1;
-			}
-			else 
-			{
-				buf[buf_pos++] = str[i++];
-				continue;
+
+				// Write digits in correct order
+				for (int j = num_pos - 1; j >= 0; --j) {
+					buf[buf_pos++] = num_buf[j];
+				}
+				i += 2;
 			}
 			arg_pos++;
-			i++;
-		}
+		} 
 		else
-			buf[buf_pos++] = str[i];
+			buf[buf_pos++] = str[i++];
+	}
+	buf[buf_pos] = '\0'; // Null-terminate the buffer
+	return buf_pos;
+}
+
+short	contains(const char *from, const char *charset)
+{
+	int	charset_size = strlen(charset);
+	int	input_size = strlen(from);
+	int	i;
+
+	i = 0;
+	while (from[i] && i <= input_size - charset_size)
+	{
+		if (strncmp(&from[i], charset, charset_size) == 0)
+			return 1;
 		i++;
 	}
-	return (buf_pos);
+	return 0;
 }
