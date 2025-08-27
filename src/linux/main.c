@@ -5,37 +5,12 @@
 #define REPO_PATH	"%s/.4re5 group/repo.json"
 #define REPO_URL	"https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/repo.json"
 
-void	key_is_string_fill_the_app(APP_STRUCT *current, const char *key, const char *value)
-{
-	if (strcmp(key, "name") == 0)
-		current->name = value;
-	else if (strcmp(key, "description") == 0)
-		current->description = value;
-	else if (strcmp(key, "image") == 0)
-		current->image = value;
-	else if (strcmp(key, "first_date") == 0)
-		current->first_date = value;
-	else if (strcmp(key, "author") == 0)
-		current->author = value;
-	else if (strcmp(key, "price") == 0)
-		current->price = value;
-	else if (strcmp(key, "docs") == 0)
-		current->docs = value;
-	else if (strcmp(key, "github") == 0)
-		current->github = value;
-	else if (strcmp(key, "license") == 0)
-		current->license = value;
-	else if (strcmp(key, "package") == 0)
-		current->package = value;
-
-}
-
 const char	*json_getkey(json_t *value, char *key)
 {
 	return (json_string_value(json_object_get(value, key)));
 }
 
-int	load_json_repo()
+int	load_json_repo(short only_names, const char *search_query)
 {
 	char	REPO_PATH_PARSED[512];
 	const char	*home_dir;
@@ -69,16 +44,33 @@ int	load_json_repo()
 	{
 		if (json_is_object(value)) 
 		{
-			short	disabled = json_boolean_value(json_object_get(value, "disabled"));
-			if (disabled == 1)
-				putstrf("%sDISABLED /!\\%s", 1, COLOR_RED, COLOR_RESET);
-			putstrf("%s%s%s@%s%s\n", 1, COLOR_YELLOW, json_getkey(value, "package"), COLOR_BYELLOW, COLOR_YELLOW, "soon");
-    			putstrf("    %sname: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "name"), COLOR_RESET);
-			putstrf("    %sdescription: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "description"), COLOR_RESET);
-			putstrf("    %sauthor: \e[48;2;255;133;0m\e[38;2;255;255;255m@%s%s\n", 1, COLOR_YELLOW, json_getkey(value, "author"), COLOR_RESET);
-			putstrf("    %sfirst release: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "first_date"), COLOR_RESET);
-			putstrf("    %sname: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "name"), COLOR_RESET);
-			total_elements++;
+			const char	*disabled = json_getkey(value, "disabled");
+			if (disabled && strcmp(disabled, "true") == 0)
+				continue;
+			
+			// apply search query 
+			if (search_query == 0 
+					|| contains(json_getkey(value, "package"), search_query)
+					|| contains(json_getkey(value, "name"), search_query)
+					|| contains(json_getkey(value, "description"), search_query))
+			{
+
+				// extract version
+				int	platformid = 0;
+				json_t	platform;
+				if (json_array_foreach(json_array_value(json_object_get(value, "platform")), platformid, platform)) {
+					
+				}
+				total_elements++;
+				putstrf("%s%s%s@%s%s\n", 1, COLOR_YELLOW, json_getkey(value, "package"), COLOR_BYELLOW, COLOR_YELLOW, "soon");
+				if (only_names)
+					continue;
+				putstrf("    %sname: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "name"), COLOR_RESET);
+				putstrf("    %sdescription: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "description"), COLOR_RESET);
+				putstrf("    %sauthor: \e[48;2;255;133;0m\e[38;2;255;255;255m@%s%s\n", 1, COLOR_YELLOW, json_getkey(value, "author"), COLOR_RESET);
+				putstrf("    %sfirst release: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "first_date"), COLOR_RESET);
+				putstrf("    %sname: %s%s\n", 1, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(value, "name"), COLOR_RESET);
+			}
 		}
 	}
 	json_decref(root);
@@ -148,11 +140,25 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 		check_repo(1); // force updating repo
 	else if (strcmp(argv[1], "list") == 0)
 	{
-		int total_elem = load_json_repo(); 
+		int total_elem = load_json_repo(1, 0); 
 		if(total_elem != -1)
 			putstrf("%sSuccessfully displayed %i elements%s\n", 1, COLOR_YELLOW, total_elem, COLOR_RESET);
 		else
 			putstrf("%s[%sx%s] Error while loading app list%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
+	}
+	else if (strcmp(argv[1], "search") == 0)
+	{
+		if (argc >= 3)
+		{
+			int total_elem = load_json_repo(0, argv[2]);
+			if (total_elem != -1)
+				putstrf("%sSuccessfully displayed %i elements from query%s\n", 1, COLOR_YELLOW, total_elem, COLOR_RESET);
+			else
+				putstrf("%s[%sx%s] No result to be shown here%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
+
+		}
+		else 
+			putstrf("%s[%sx%s] Please enter a search query%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
 	}
 	else
 		putstrf("%s[%sx%s] Invalid argument at position id:1%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
