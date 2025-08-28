@@ -1,9 +1,5 @@
 #include "defs.h"
-
-// repo informations
-#define APP_DIR		"%s/.4re5 group/"
-#define REPO_PATH	"%s/.4re5 group/repo.json"
-#define REPO_URL	"https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/repo.json"
+#include "config.h"
 
 const char	*json_getkey(json_t *value, char *key)
 {
@@ -57,9 +53,11 @@ int	load_json_repo(short only_names, const char *search_query)
 
 				// extract version
 				int	platformid = 0;
-				json_t	platform;
-				if (json_array_foreach(json_array_value(json_object_get(value, "platform")), platformid, platform)) {
-					
+				json_t	*platform;
+				json_array_foreach(json_object_get(value, "platform"), platformid, platform) 
+				{
+					if (platformid != -1 && platform != NULL)
+						putstrf("platformid: %i\n", 1, platformid);
 				}
 				total_elements++;
 				putstrf("%s%s%s@%s%s\n", 1, COLOR_YELLOW, json_getkey(value, "package"), COLOR_BYELLOW, COLOR_YELLOW, "soon");
@@ -124,7 +122,7 @@ int	main(int argc, char **argv)
 	//  repo is it does not exist
 	check_repo(0);
 	if (strcmp(argv[1], "--help") == 0) {
-		putstrf("4re5 manager, version v%s\nUsage:  %s [option]\n        %s [option] package_name\n\n", 1, "1.8", argv[0], argv[0]);
+		putstrf("4re5 manager, version %s:%s\nUsage:  %s [option]\n        %s [option] package_name\n\n", 1, VERSION, BUILD_TYPE, argv[0], argv[0]);
 		putstrf("Official 4re5 app downloader & updater with 4re5 security features for authentification and more\n\n", 1);
 		putstrf("4re5 manager options:\n\
     list\n\
@@ -138,6 +136,9 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 	}
 	else if (strcmp(argv[1], "update") == 0)
 		check_repo(1); // force updating repo
+	else if (strcmp(argv[1], "version") == 0)
+		putstrf("4re5 manager %s\nVersion build-type: %s\nVersion build date: %s\nRun '%s --help' for more info\n", 1, \
+				VERSION, BUILD_TYPE, BUILD_DATE, argv[0]);
 	else if (strcmp(argv[1], "list") == 0)
 	{
 		int total_elem = load_json_repo(1, 0); 
