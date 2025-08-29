@@ -36,15 +36,15 @@ int	count_occurrences(char *str, char *charset)
 	return (count);
 }
 
-int	strformat(char *str, char *buf, ...)
+int	strformat(char *input, char *output, ...)
 {
 	va_list	args;
 	int	res;
 
-	va_start(args, buf);
+	va_start(args, output);
 
-	res = strformat_va(str, buf, args);
-	buf[res] = '\0';
+	res = strformat_va(input, output, args);
+	output[res] = '\0';
 	va_end(args);
 	return (res);
 }

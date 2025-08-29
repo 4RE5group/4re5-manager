@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <curl/curl.h>
 #include <stdlib.h>
+#include <libgen.h>
 
 #include <jansson.h>
 
@@ -33,6 +34,11 @@
 
 #define COLOR_RESET	"\e[0m"
 
+// platforms id
+#define PLATFORM_WINDOWS 0
+#define PLATFORM_ANDROID 1
+#define PLATFORM_LINUX   2
+
 // utils.c
 void	putstrf(char *str, int fd, ...);
 int	strformat_va(char *str, char *buf, va_list args);
@@ -40,6 +46,6 @@ int	strformat(char *str, char *buf, ...);
 short	contains(const char *from, const char *charset);
 
 // fetch_repo.c
-int	fetch_repo(char *url, char *output_file);
+int	fetch_url(char *url, char *output_file);
 
 #endif

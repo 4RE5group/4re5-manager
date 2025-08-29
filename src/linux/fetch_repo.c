@@ -3,12 +3,11 @@
 size_t	write_callback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	size_t realsize = size * nmemb;
-	//__builtin_printf("content: %s\n", (char *)contents);
 	FILE *fp = (FILE *)userp;
 	return (fwrite(contents, 1, realsize, fp));
 }
 
-int	fetch_repo(char *url, char *output_file)
+int	fetch_url(char *url, char *output_file)
 {
 	CURL *curl = NULL;
 	CURLcode res;
