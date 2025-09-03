@@ -6,7 +6,7 @@ Official 4re5 app downloader &amp; updater with 4re5 security features for authe
 ### Android
 1. Download [apk file](https://github.com/4RE5group/4re5-manager/releases/download/v1.7-beta/release.apk)
 2. Install apk from an apk installer
-
+ 
 ## Features
 
 ### Security 🔒
