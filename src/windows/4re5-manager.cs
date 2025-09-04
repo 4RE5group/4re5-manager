@@ -41,10 +41,10 @@ namespace com.ares
             webBrowser.Size = this.Size;
             webBrowser.ScriptErrorsSuppressed = true;
             var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-            foreach (var name in names)
-            {
-                Console.WriteLine(name);
-            }
+            // foreach (var name in names)
+            // {
+                // Console.WriteLine(name);
+            // }
 
             string mainContent = GetEmbeddedHtml("main.html");
             webBrowser.DocumentText = mainContent;
@@ -54,23 +54,31 @@ namespace com.ares
         [STAThread]
         static void Main()
         {
-            // Set AUMID for current process
-            string regPath = @"Software\Classes\AppUserModelId\com.ares";
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(regPath, true))
+            try
             {
-                if (key == null)
+                // Set AUMID for current process
+                string regPath = @"Software\Classes\AppUserModelId\com.ares";
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(regPath, true))
                 {
-                    using (RegistryKey newKey = Registry.CurrentUser.CreateSubKey(regPath))
+                    if (key == null)
                     {
-                        newKey.SetValue("DisplayName", "4re5 manager");
-                        newKey.SetValue("ApplicationName", "4re5 manager");
+                        using (RegistryKey newKey = Registry.CurrentUser.CreateSubKey(regPath))
+                        {
+                            newKey.SetValue("DisplayName", "4re5 manager");
+                            newKey.SetValue("ApplicationName", "4re5 manager");
+                        }
                     }
                 }
-            }
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindow());
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new MainWindow());
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText("crash.log", ex.ToString());
+                MessageBox.Show($"An error occurred: {ex.Message}");
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ int	fetch_url(char *url, char *output_file)
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	curl = curl_easy_init();
 
-	putstrf("fetching url: '%s' to '%s'\n", 1, url, output_file);
+	//putstrf("fetching url: '%s' to '%s'\n", 1, url, output_file);
 	if (!curl)
 	{
 		putstrf("%s[%sx%s] Failed to initialize libcurl\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED);

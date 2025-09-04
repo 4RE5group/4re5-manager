@@ -1,65 +1,35 @@
-<Project ToolsVersion="v4.0.30319" Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <Optimize>yes</Optimize>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Optimize>true</Optimize>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 
-        <TargetFramework>net8.0-windows</TargetFramework>
-        <PlatformTarget>anycpu</PlatformTarget>
-        <DisableWinExeOutputInference>True</DisableWinExeOutputInference>
-        <UseWindowsForms>true</UseWindowsForms>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        
-        <PackageId>com.ares</PackageId>
-        <Product>4re5 Manager</Product>
+    <PackageId>com.ares</PackageId>
+    <Product>4re5 Manager</Product>
+    <AssemblyTitle>4re5 Manager</AssemblyTitle>
+    <AssemblyName>4re5-manager</AssemblyName>
+    <AssemblyProduct>4re5 Manager</AssemblyProduct>
+    <AssemblyDescription>Official 4re5 app downloader and updater with security features</AssemblyDescription>
+    <AssemblyCompany>4re5 group</AssemblyCompany>
+    <Authors>4re5 group</Authors>
+    <PackageProjectUrl>https://4re5group.github.io</PackageProjectUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryUrl>https://github.com/4re5group/4re5-manager</RepositoryUrl>
+    <AssemblyCopyright>Copyright 4re5 group © 2025</AssemblyCopyright>
+    <Copyright>Copyright 4re5 group © 2025</Copyright>
+    <Configuration>Release</Configuration>
+    <AssemblyVersion>1.8</AssemblyVersion>
+    <FileVersion>1.8 beta</FileVersion>
+    <Version>1.8-beta</Version>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
 
-        <AssemblyTitle>4re5 Manager</AssemblyTitle>
-        <AssemblyName>4re5-manager</AssemblyName>
-        <AssemblyProduct>4re5 Manager</AssemblyProduct>
-        <AssemblyDescription>Official 4re5 app downloader and updater with security features</AssemblyDescription>
-        
-        <AssemblyCompany>4re5 group</AssemblyCompany>
-        <Authors>4re5 group</Authors>
-        
-        <PackageProjectUrl>https://4re5group.github.io</PackageProjectUrl>
-        <RepositoryType>GitHub</RepositoryType>
-        <RepositoryUrl>https://github.com/4re5group/4re5-manager</RepositoryUrl>
-        
-        
-        
-        <AssemblyCopyright>Copyright 4re5 group © 2025</AssemblyCopyright>
-        <Copyright>Copyright 4re5 group © 2025</Copyright>
-        
-        <Configuration>Release</Configuration>
-        
-        <AssemblyVersion>1.8 beta</AssemblyVersion>
-        <FileVersion>1.8 beta</FileVersion>
-        <Version>1.8-beta</Version>
-        <NeutralLanguage>en-US</NeutralLanguage>
-
-        <ApplicationManifest>app.manifest</ApplicationManifest>
-        <ApplicationIcon>icon.ico</ApplicationIcon>
-
-        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-        <SelfContained>true</SelfContained>
-        <PublishSingleFile>true</PublishSingleFile>
-        <PublishReadyToRun>true</PublishReadyToRun>
-        <PublishTrimmed>false</PublishTrimmed>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <CSFile Include="*.cs"/>
-        <!-- <EmbeddedResource Include="app\main.html" /> -->
-    </ItemGroup>
-	<Target Name="Compile">
-        <CSC Sources="@(CSFile)"
-            DebugType="$(DebugType)"
-			TargetType="Exe"
-            Optimize="$(Optimize)"
-			Win32Icon="$(ApplicationIcon)"
-			References=""
-			Resources="app\main.html"
-            OutputAssembly="4re5-manager.exe">
-            <Output TaskParameter="OutputAssembly" ItemName="EXEFile" />
-        </CSC>
-    </Target>
+  <ItemGroup>
+    <EmbeddedResource Include="app\main.html" />
+  </ItemGroup>
 </Project>

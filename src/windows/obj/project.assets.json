@@ -145,10 +145,6 @@
             "version": "[8.0.1, 8.0.1]"
           },
           {
-            "name": "Microsoft.NETCore.App.Crossgen2.win-x64",
-            "version": "[8.0.1, 8.0.1]"
-          },
-          {
             "name": "Microsoft.NETCore.App.Runtime.win-x64",
             "version": "[8.0.1, 8.0.1]"
           },

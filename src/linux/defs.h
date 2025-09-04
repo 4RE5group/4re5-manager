@@ -40,12 +40,19 @@
 #define PLATFORM_LINUX   2
 
 // utils.c
-void	putstrf(char *str, int fd, ...);
-int	strformat_va(char *str, char *buf, va_list args);
-int	strformat(char *str, char *buf, ...);
-short	contains(const char *from, const char *charset);
+void		putstrf(char *str, int fd, ...);
+int		strformat_va(char *str, char *buf, va_list args);
+int		strformat(char *str, char *buf, ...);
+short		contains(const char *from, const char *charset);
+const char	*json_getkey(json_t *value, char *key);
+float		version_to_number(char *version);
+json_t		*get_repo();
+void	puterror(char	*msg);
 
 // fetch_repo.c
-int	fetch_url(char *url, char *output_file);
+int		fetch_url(char *url, char *output_file);
+
+// installation.c
+int		install(char *package_name);
 
 #endif

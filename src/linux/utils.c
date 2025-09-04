@@ -1,5 +1,9 @@
 #include "defs.h"
+#include "config.h"
 
+/*
+	A simple printf.
+*/
 void	putstrf(char *str, int fd, ...)
 {	
 	char	buf[4096];
@@ -12,6 +16,84 @@ void	putstrf(char *str, int fd, ...)
 	va_end(args);
 }
 
+/*
+	Needed to be able to extract strings from repo without writing big lines
+*/
+const char	*json_getkey(json_t *value, char *key)
+{
+	return (json_string_value(json_object_get(value, key)));
+}
+
+/*
+	Reads the json file associated to the repository.
+*/
+json_t	*get_repo()
+{
+	json_t *root;
+	json_error_t error;
+
+	// Load JSON file
+	root = json_load_file(REPO_PATH, 0, &error);
+	if (!root) {
+		putstrf("%s[%sx%s] An error occured while loading JSON repository \n\t=> '%s'%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, error.text, COLOR_RESET);
+		return ((json_t *)0);
+	}
+	// Check if root is an array
+	if (!json_is_array(root)) {
+		putstrf("%s[%sx%s] JSON repository is invalid, try updating it or try again later%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, COLOR_RESET);
+		json_decref(root);
+		return ((json_t *)0);
+	}
+
+	return (root);
+}
+
+/*
+	Converts a string formatted as 4re5 versions (v1.xx.xxx) to a float.
+	ex:
+		v1.123.456 => 1.123456
+	needed to compare versions
+*/
+float	version_to_number(char *version)
+{
+	float	num = 0.0f;
+	size_t	i = 0;
+	float	size = 0.1f;
+
+	// int part
+	while(version && version[i] && version[i] != '.')
+	{
+		// if number
+		if (version[i] >= '0' && version[i] <= '9')
+			num = num * 10 + (version[i] - '0');
+		i++;
+	}
+	// decimals part
+	while(version && version[i])
+	{
+		// if number
+		if (version[i] >= '0' && version[i] <= '9')
+		{
+			num += size * (version[i] - '0');
+			size /= 10;
+		}
+		i++;
+	}
+	return (num);
+}
+
+/*
+	Display an error and exit with return code of 1.
+*/
+void	puterror(char	*msg)
+{
+	putstrf("%s[%sx%s] %s%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, msg, COLOR_RESET);
+	exit(1);
+}
+
+/*
+	Count the occurence of a charset inside a string.
+*/
 int	count_occurrences(char *str, char *charset)
 {
 	size_t	i;
