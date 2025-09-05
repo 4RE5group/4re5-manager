@@ -26,7 +26,7 @@ sudo dpkg -i release.deb
 - Everything is encrypted from login to personnal data
 - Enhanced protection against attackers
 <br><br>
-
+ 
 <br>
 
 ### Easy to use 📊
