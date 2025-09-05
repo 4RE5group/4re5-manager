@@ -2,45 +2,14 @@
 #include "config.h"
 
 /*
-	Returns the version of installed app.
-	If not installed returns -1
-*/
-float	get_package_version(const char *package)
-{
-	char		package_path[512];
-	char		manifest_path[512];
-
-	strformat(PACKAGES_DIR, package_path, APP_DIR, package);
-	strformat("%s/manifest", manifest_path, package_path);
-
-	// check if ~/4re5 group/packages/package/manifest exists
-	if (access(manifest_path, F_OK) != -1)
-	{
-		json_t *root;
-		json_error_t error;
-
-		// Load JSON file
-		root = json_load_file(manifest_path, 0, &error);
-		if (!root) {
-			putstrf("%s[%sx%s] An error occured while loading this manifest:\n\t=> '%s'", 2, COLOR_RED, COLOR_BRED, COLOR_RED, error.text);
-			putstrf("\n\t=> package: %s", 2, package);
-			putstrf("\n\t=> path:    %s\n", 2, manifest_path);
-			return (-1.0);
-		}
-		return (version_to_number((char *)json_getkey(root, "version")));
-	}
-	return (-1.0);
-}
-
-/*
 	Process json data.
 */
 int	load_json_repo(short only_names, const char *search_query)
 {
-	json_t *root;
-	size_t index;
-	json_t *value;
-	int	total_elements;
+	json_t		*root;
+	size_t		index;
+	json_t		*value;
+	int		total_elements;
 	
 	total_elements = -1;
 
@@ -79,7 +48,7 @@ int	load_json_repo(short only_names, const char *search_query)
 				}
 				if (!platform || strcmp(version, "not found") == 0)
 					continue;
-				char	name_line[512];
+				char	name_line[PATH_SIZE];
 				total_elements++;
 				strformat("%s%s%s@%sv%s    ", name_line, COLOR_YELLOW, json_getkey(value, "package"), COLOR_BGREEN, COLOR_WHITE, version);
 				// fill with spaces until 60th character
@@ -143,7 +112,7 @@ void	check_repo(short force_updating)
 		// fetch the repository json file
 		if (fetch_url(REPO_URL, REPO_PATH) == 1)
 			puterror("Could not download the file");
-		putstrf("%s[%s+%s] Updated the repository successfully!%s\n", 1, COLOR_BGREEN, COLOR_GREEN, COLOR_BGREEN, COLOR_RESET);
+		putstrf("Updated the repository successfully!\n", 1);
 	}
 }
 
@@ -156,18 +125,18 @@ int	main(int argc, char **argv)
 		puterror("Invalid arguments, use --help to get list of valid arguments");
 	//  repo is it does not exist
 	check_repo(0);
-	if (strcmp(argv[1], "--help") == 0) {
+	if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) {
 		putstrf("4re5 manager, version %s:%s\nUsage:  %s [option]\n        %s [option] package_name\n\n", 1, VERSION, BUILD_TYPE, argv[0], argv[0]);
 		putstrf("Official 4re5 app downloader & updater with 4re5 security features for authentification and more\n\n", 1);
 		putstrf("4re5 manager options:\n\
-    --help\n\
+    --help or -h\n\
     list [full]\n\
     search <query>\n\
     install <package_name>\n\
     remove <package_name>\n\
     version\n\
     update\n\
-    upgrade [package]\n\
+    upgrade [package list]\n\
 More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 	}
 	else if (strcmp(argv[1], "update") == 0)
@@ -195,7 +164,7 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 		{
 			int total_elem = load_json_repo(0, argv[2]);
 			if (total_elem != -1)
-				putstrf("%sSuccessfully displayed %i elements from query%s\n", 1, COLOR_YELLOW, total_elem, COLOR_RESET);
+				putstrf("Successfully displayed %i elements from query\n", 1, total_elem);
 			else
 				puterror("No result to be shown here");
 		}
@@ -206,30 +175,53 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 	{
 		if (argc != 3)
 		{
-			putstrf("%s[%sx%s] Error, format: %s install [package name]%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, argv[0], COLOR_RESET);
+			putstrf("%serror%s: Format: %s install [package name]\n", 2, COLOR_RED, COLOR_RESET, argv[0]);
 			return (1);
 		}
 		// try to install package
-		if (install(argv[2]))
+		if (!install(argv[2]))
 			putstrf("Successfully installed %s on your system!\n", 1, argv[2]);
 		else
 		{
-			putstrf("%s[%sx%s] Cound not find requested package, try maybe updating using '%s update'%s\n", 2, COLOR_BRED, COLOR_RED, COLOR_BRED, argv[0], COLOR_RESET);
+			putstrf("%serror%s: Cound not find requested package, try updating using '%s update'\n", 2, COLOR_RED, COLOR_RESET, argv[0]);
 			return (1);
 		}
 	}
 	else if (strcmp(argv[1], "upgrade") == 0)
 	{
-		if (argc == 2) // upgrade all
+		char	**target = 0;
+	
+		if (argc > 2) // if specific packages are put into upgrade command, do them all
+			target = &(argv[2]);
+		putstrf("Running upgrade job on target%s '", 1, (argc == 2)?"":"s");
+		int	j = 0;
+		while (j < (argc - 2))
 		{
-
+			putstrf("%s%s", 1, argv[j + 2], (j == argc - 3)?"":" ");
+			j++;
 		}
-		else if (argc == 3) // upgrade package
-		{
-
-		}
+		putstrf("%s'...\n", 1, (argc == 2)?"all":"");
+		int total_packages = upgrade_installed(argc - 2, target);
+		if (total_packages == -1)
+			puterror("An error occured while upgrading apps");
 		else
-			puterror("Invalid argument at position id:4");
+		{
+			putstrf("Upgraded %i packages!\n", 1, total_packages);
+			// check if all packages were found
+			if (total_packages == argc - 2)
+				putstrf("All packages were upgraded!\n", 1);
+			else
+			{
+				putstrf("%serror%s: Could not find these packages:\n", 2, COLOR_RED, COLOR_RESET);
+				for(int k=0; k<argc - 2; k++)
+				{
+					if (get_package_version(argv[k + 2]) == -1.0f)
+						putstrf("    %s\n", 2, argv[k + 2]);
+				}
+				
+			}
+
+		}
 	}
 	else
 		puterror("Invalid argument at position id:1");

@@ -17,12 +17,94 @@ void	putstrf(char *str, int fd, ...)
 }
 
 /*
+	Delete the directory and sub files/directories
+*/
+int	delete_directory(const char *path)
+{
+	DIR *dir;
+	struct dirent *entry;
+	struct stat statbuf;
+	char fullpath[1024];
+
+	if (!(dir = opendir(path)))
+	{
+		perror("opendir");
+		return (1);
+	}
+
+	while ((entry = readdir(dir)))
+	{
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		strformat("%s/%s", fullpath, path, entry->d_name);
+
+		if (lstat(fullpath, &statbuf) == -1)
+		{
+			perror("lstat");
+			continue;
+		}
+
+		if (S_ISDIR(statbuf.st_mode))
+			delete_directory(fullpath);
+		else 
+			if (unlink(fullpath) == -1) 
+			{
+				perror("unlink");
+				return (1);
+			}
+	}
+	closedir(dir);
+
+	if (rmdir(path) == -1)
+	{	
+		perror("rmdir");
+		return (1);
+	}
+	return (0);
+}
+
+/*
 	Needed to be able to extract strings from repo without writing big lines
 */
 const char	*json_getkey(json_t *value, char *key)
 {
 	return (json_string_value(json_object_get(value, key)));
 }
+
+
+/*
+	Returns the version of installed app.
+	If not installed returns -1
+*/
+float	get_package_version(const char *package)
+{
+	char		package_path[PATH_SIZE];
+	char		manifest_path[PATH_SIZE];
+
+	strformat(PACKAGES_DIR, package_path, APP_DIR, package);
+	strformat("%s/manifest", manifest_path, package_path);
+
+	// check if ~/4re5 group/packages/package/manifest exists
+	if (access(manifest_path, F_OK) != -1)
+	{
+		json_t *root;
+		json_error_t error;
+
+		// Load JSON file
+		root = json_load_file(manifest_path, 0, &error);
+		if (!root) {
+			putstrf("%s[%sx%s] An error occured while loading this manifest:\n\t=> '%s'", 2, COLOR_RED, COLOR_BRED, COLOR_RED, error.text);
+			putstrf("\n\t=> package: %s", 2, package);
+			putstrf("\n\t=> path:	%s\n", 2, manifest_path);
+			return (-1.0);
+		}
+		return (version_to_number((char *)json_getkey(root, "version")));
+	}
+	return (-1.0);
+}
+
+
 
 /*
 	Reads the json file associated to the repository.
@@ -87,7 +169,7 @@ float	version_to_number(char *version)
 */
 void	puterror(char	*msg)
 {
-	putstrf("%s[%sx%s] %s%s\n", 2, COLOR_RED, COLOR_BRED, COLOR_RED, msg, COLOR_RESET);
+	putstrf("%serror%s: %s\n", 2, COLOR_RED, COLOR_RESET, msg);
 	exit(1);
 }
 
@@ -118,6 +200,10 @@ int	count_occurrences(char *str, char *charset)
 	return (count);
 }
 
+/*
+	Format a string with its parameters.
+	        "the homemade printf"
+*/
 int	strformat(char *input, char *output, ...)
 {
 	va_list	args;
@@ -144,8 +230,12 @@ int strformat_va(char *str, char *buf, va_list args) {
 			if (strncmp(&str[i], "%s", 2) == 0) 
 			{
 				char *current = va_arg(args, char *);
-				while (*current)
-					buf[buf_pos++] = *current++;
+				if (!current)
+					buf[buf_pos++] = '*';
+					//strncpy("(null)", &buf[buf_pos], 6); // handle null values
+				size_t	j = 0;
+				while (current && current[j])
+					buf[buf_pos++] = current[j++];
 				i += 2;
 			} 
 			else if (strncmp(&str[i], "%i", 2) == 0) 
@@ -189,6 +279,9 @@ int strformat_va(char *str, char *buf, va_list args) {
 	return buf_pos;
 }
 
+/*
+	Simple str.include function.
+*/
 short	contains(const char *from, const char *charset)
 {
 	int	charset_size = strlen(charset);
@@ -203,4 +296,20 @@ short	contains(const char *from, const char *charset)
 		i++;
 	}
 	return 0;
+}
+
+
+/*
+	Array contains function. Same as upper. But for arrays.
+*/
+short	arrayContains(size_t arr_size, char **arr, char *charset)
+{
+	size_t	i = 0;
+	while (i < arr_size)
+	{
+		if (strcmp(arr[i], charset) == 0)
+			return (1);
+		i++;
+	}
+	return (0);
 }

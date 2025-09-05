@@ -6,7 +6,7 @@ C_FILES = main.c utils.c fetch_repo.c installation.c
 O_FILES = $(C_FILES:.c=.o)
 DEB_FOLDER = release-deb
 DEB_FILE_NAME = release.deb
-
+DEPENDENCIES = libcurl4-openssl-dev libjansson-dev libssl-dev
 
 # Cross-compilation toolchains
 CC_x86 = gcc -m32
@@ -36,4 +36,7 @@ release: all
 clean:
 	rm -rf $(OUT_x86_64) $(O_FILES)
 
-.PHONY: all release clean
+deps:
+	sudo apt install $(DEPENDENCIES)
+
+.PHONY: all release clean deps
