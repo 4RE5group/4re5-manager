@@ -217,6 +217,9 @@ int	strformat(char *input, char *output, ...)
 	return (res);
 }
 
+/*
+	Auxiliary function that handles va args.
+*/
 int strformat_va(char *str, char *buf, va_list args) {
 	size_t i = 0;
 	int buf_pos = 0;

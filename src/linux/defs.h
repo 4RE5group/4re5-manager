@@ -59,5 +59,9 @@ int		fetch_url(char *url, char *output_file);
 // installation.c
 int		install(char *package_name);
 int		upgrade_installed(size_t package_count, char **package_list);
+int		remove_installed(char *package);
+
+// security
+void		sanitizePath(char *path);
 
 #endif

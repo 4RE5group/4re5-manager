@@ -22,9 +22,9 @@ void	write_manifest(json_t *elem, const char *filename)
 	json_object_set(manifest, "package", json_string(json_string_value(json_object_get(elem, "package"))));
 
 	// Get the Linux platform (platformid 2)
-	json_t *platforms = json_object_get(elem, "platform");
-	size_t index;
-	json_t *value;
+	json_t	*platforms = json_object_get(elem, "platform");
+	size_t	index;
+	json_t	*value;
 	json_array_foreach(platforms, index, value) {
 		json_t *platformid = json_object_get(value, "platformid");
 		if (json_integer_value(platformid) == 2) { // Linux
@@ -45,12 +45,15 @@ void	write_manifest(json_t *elem, const char *filename)
 		fclose(f);
 	}
 
-	putstrf("%s[%s+]%s Manifest created!%s\n", 1, COLOR_BGREEN, COLOR_GREEN, COLOR_BGREEN, COLOR_RESET);
+	putstrf("%sPackage manifest created!%s\n", 1, COLOR_BYELLOW, COLOR_RESET);
 	json_decref(manifest);
 }
 
 /*
 	Remove installed package if it is installed.
+	Returns: -1 if does not exist
+	         0 if success
+	         1 if could not delete
 */
 int	remove_installed(char *package)
 {
@@ -60,7 +63,7 @@ int	remove_installed(char *package)
 
 	// check if package is not installed
 	if (access(path, F_OK) == -1)
-		return (1);
+		return (-1);
 
 	return (delete_directory(path));	
 }
@@ -68,6 +71,7 @@ int	remove_installed(char *package)
 /*
 	Process operations on installed packages: 
 	ex: upgrade all of upgradable.
+	    upgrade only few packages.
 */
 int	upgrade_installed(size_t package_count, char **package_list)
 {
@@ -119,9 +123,10 @@ int	upgrade_installed(size_t package_count, char **package_list)
 							putstrf("Upgrading %s...\n", 1, package);
 							if (install(package))
 								putstrf("%serror%s: Could not proceed with the installation of %s!\n", 2, COLOR_RED, COLOR_RESET, package);
+							total++;
+
 						}
 
-						total++;
 						break;
 					}
 				}
@@ -156,12 +161,13 @@ int	install(char	*package_name)
 	if (!root)
 		return (1);
 
-	const char	*package;
+	char		*package;
 	short		found = 0;
 	char		installation_output[PATH_SIZE];
 	json_array_foreach(root, i, value)
 	{
-		package = json_getkey(value, "package");
+		package = (char *)json_getkey(value, "package");
+		sanitizePath(package); // sanitize path against path injection
 		if (strcmp(package, package_name) == 0)
 		{
 			json_array_foreach(json_object_get(value, "platform"), j, platform)
@@ -177,10 +183,10 @@ int	install(char	*package_name)
 					strformat(PACKAGES_DIR, installation_output, APP_DIR, package);
 					if (access(installation_output, F_OK) == -1)
 						if (!mkdir(installation_output, 0777))
-							putstrf("%s[%s+%s] Successfully initialised package directory!\n", 1, COLOR_BGREEN, COLOR_GREEN, COLOR_BGREEN, COLOR_RESET);
-					putstrf("Found package: %s%s%s, version: %sv%s\n%s[%s~%s] Starting installation into %s/...%s\n", 1, COLOR_BGREEN, package, COLOR_RESET, COLOR_BGREEN, json_getkey(platform, "version"), COLOR_BYELLOW, COLOR_YELLOW, COLOR_BYELLOW, installation_output, COLOR_RESET);
+							putstrf("Successfully initialised package directory!\n", 1);
+					putstrf("Found package: %s%s%s, version: %sv%s%s\ninstalling into %s/...\n", 1, COLOR_BGREEN, package, COLOR_RESET, COLOR_BGREEN, json_getkey(platform, "version"), COLOR_RESET, installation_output);
 					
-					putstrf("%s[%s~%s] Downloading %s...%s\n", 1, COLOR_BYELLOW, COLOR_YELLOW, COLOR_BYELLOW, json_getkey(platform, "url"), COLOR_RESET);
+					putstrf("Downloading %s...\n", 1, json_getkey(platform, "url"));
 
 					char	output_file[PATH_SIZE];
 					char	manifest_path[PATH_SIZE];
@@ -192,16 +198,20 @@ int	install(char	*package_name)
 					// download package
 					fetch_url((char *)json_getkey(platform, "url"), output_file);
 				
-					// write package manifest
-					write_manifest(value, manifest_path);
-
 					// if is installer, execute installation command
 					if (strcmp(json_getkey(platform, "isInstaller"), "true") == 0)
 					{
 						// execute install command
 						strformat((char *)json_getkey(platform, "installProcess"), install_command, output_file);
-						system(install_command);
+						// check if an error occured
+						if(system(install_command) != 0)
+							puterror("An error occured while running post-installation command");
 					}
+
+					// write package manifest
+					write_manifest(value, manifest_path);
+
+
 
 					// create the symlink to the startup item inside 
 					///usr/sbin/itemname -> ~/.4re5 group/packages/packagename/itemname
@@ -213,7 +223,8 @@ int	install(char	*package_name)
 					strformat("%s/%s", startUpFile, installation_output, (char *)json_getkey(platform, "startUpFile"));
 					strformat("ln -s '%s' '%s'", ln_command, startUpFile, links_path);
 					// create symlink to /usr/sbin/
-					system(ln_command);
+					if (system(ln_command) != 0)
+						putstrf("%serror%s: Could not create symlink of this package\n", 2, COLOR_RED, COLOR_RESET);
 					// make downloaded file executable
 					strformat("chmod +x '%s'", perm_command, startUpFile);
 					system(perm_command);

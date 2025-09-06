@@ -1,17 +1,15 @@
 OUT = 4re5-manager
 C = gcc
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror
 LDFLAGS = -lcurl -lssl -lcrypto -ljansson
-C_FILES = main.c utils.c fetch_repo.c installation.c
+C_FILES = main.c utils.c fetch_repo.c installation.c security.c
 O_FILES = $(C_FILES:.c=.o)
 DEB_FOLDER = release-deb
 DEB_FILE_NAME = release.deb
 DEPENDENCIES = libcurl4-openssl-dev libjansson-dev libssl-dev
 
 # Cross-compilation toolchains
-CC_x86 = gcc -m32
 CC_x86_64 = gcc -m64
-CC_aarch64 = aarch64-linux-gnu-gcc
 
 # Output binary names for each architecture
 OUT_x86_64 = $(OUT)_x86_64

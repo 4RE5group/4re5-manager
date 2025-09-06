@@ -2,7 +2,7 @@
 #include "config.h"
 
 /*
-	Process json data.
+	Process json data into a listing function.
 */
 int	load_json_repo(short only_names, const char *search_query)
 {
@@ -116,7 +116,7 @@ void	check_repo(short force_updating)
 	}
 }
 
-int	main(int argc, char **argv)
+int	main(int argc, char *argv[])
 {
 	// check if user has administrative rights
 	if (geteuid() != 0)
@@ -134,14 +134,14 @@ int	main(int argc, char **argv)
     search <query>\n\
     install <package_name>\n\
     remove <package_name>\n\
-    version\n\
+    --version or -v\n\
     update\n\
     upgrade [package list]\n\
 More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 	}
 	else if (strcmp(argv[1], "update") == 0)
 		check_repo(1); // force updating repo
-	else if (strcmp(argv[1], "version") == 0)
+	else if (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0)
 		putstrf("4re5 manager %s\nVersion build-type: %s\nVersion build date: %s\nRun '%s --help' for more info\n", 1, \
 				VERSION, BUILD_TYPE, BUILD_DATE, argv[0]);
 	else if (strcmp(argv[1], "list") == 0)
@@ -179,6 +179,7 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 			return (1);
 		}
 		// try to install package
+		sanitizePath(argv[2]); // sanitize against path injection
 		if (!install(argv[2]))
 			putstrf("Successfully installed %s on your system!\n", 1, argv[2]);
 		else
@@ -197,6 +198,7 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 		int	j = 0;
 		while (j < (argc - 2))
 		{
+			sanitizePath(argv[j + 2]); // sanitize input against path injection
 			putstrf("%s%s", 1, argv[j + 2], (j == argc - 3)?"":" ");
 			j++;
 		}
@@ -210,7 +212,7 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 			// check if all packages were found
 			if (total_packages == argc - 2)
 				putstrf("All packages were upgraded!\n", 1);
-			else
+			else if (argc != 2)
 			{
 				putstrf("%serror%s: Could not find these packages:\n", 2, COLOR_RED, COLOR_RESET);
 				for(int k=0; k<argc - 2; k++)
@@ -221,6 +223,23 @@ More information available at: https://github.com/4RE5group/4re5-manager\n", 1);
 				
 			}
 
+		}
+	}
+	else if (strcmp(argv[1], "remove") == 0)
+	{
+		if (argc == 3)
+		{
+			sanitizePath(argv[2]); // sanitize input against path injection
+			int status = remove_installed(argv[2]);
+			if (status == 0)
+				putstrf("Successfully uninstalled package %s\n", 1, argv[2]);
+			else if (status == -1)
+				puterror("Package is not installed");
+			else
+				puterror("Could not remove package!");
+		}
+		else {
+			puterror("Invalid arguments list");
 		}
 	}
 	else
