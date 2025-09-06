@@ -99,6 +99,8 @@ int	load_json_repo(short only_names, const char *search_query)
 void	check_repo(short force_updating)
 {
 	int	status;
+	char	app_path[PATH_SIZE];
+	char	app_manifest_path[PATH_SIZE];
 
 	// check if repo json file exists
 	if (access(REPO_PATH, F_OK) == -1)
@@ -113,6 +115,16 @@ void	check_repo(short force_updating)
 		if (fetch_url(REPO_URL, REPO_PATH) == 1)
 			puterror("Could not download the file");
 		putstrf("Updated the repository successfully!\n", 1);
+	}
+
+	// check if /usr/share/4re5 group/packages/com.ares/ exists
+	// it mean 4re5-manager has just been installed from the deb, but need to add the manifest
+	strformat(PACKAGES_DIR, app_path, APP_DIR, "com.ares/");
+	strformat("%s/manifest", app_manifest_path, app_path);
+	if (access(app_manifest_path, F_OK) == -1 && access(app_path, F_OK) != -1)
+	{
+		putstrf("First launch triggered, verifying installation...\n", 1);
+		install("com.ares");
 	}
 }
 

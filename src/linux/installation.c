@@ -58,12 +58,18 @@ void	write_manifest(json_t *elem, const char *filename)
 int	remove_installed(char *package)
 {
 	char		path[PATH_SIZE];
+	char		link[PATH_SIZE];
 
 	strformat(PACKAGES_DIR, path, APP_DIR, package);
+	strformat(LINKS_DIR, link, package);
 
 	// check if package is not installed
 	if (access(path, F_OK) == -1)
 		return (-1);
+	// check if symlink exists
+	if (access(link, F_OK) != -1)
+		if (!unlink(link))
+			return (1);
 
 	return (delete_directory(path));	
 }

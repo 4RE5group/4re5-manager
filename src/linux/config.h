@@ -3,7 +3,7 @@
 
 // 4re5 manager configuration file
 #define VERSION "v1.8"
-#define BUILD_DATE "09/06/2025_18:20"
+#define BUILD_DATE "09/06/2025_20:34"
 #define BUILD_TYPE "beta"
 
 /* --- Repo Informations --- */
