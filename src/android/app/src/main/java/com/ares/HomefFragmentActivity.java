@@ -481,34 +481,35 @@ return;
 		try{
 			tmpListMap = new Gson().fromJson(_json_parser(_map.get((int)_pos).get("platform").toString()), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
 			SketchwareUtil.sortListMap(tmpListMap, "platformid", false, true);
-			for (int i = 0; i < (int)(tmpListMap.size()); i++) {
-				if (tmpListMap.get((int)i).get("name").toString().contains("Android")) {
+		}catch(Exception e){
+			SketchwareUtil.showMessage(getContext().getApplicationContext(), "invalid platform json");
+			((ClipboardManager) getContext().getSystemService(getContext().getApplicationContext().CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", _map.get((int)_pos).get("platform").toString()));
+			((ClipboardManager) getContext().getSystemService(getContext().getApplicationContext().CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", _json_parser(_map.get((int)_pos).get("platform").toString())));
+		}
+		for (int i = 0; i < (int)(tmpListMap.size()); i++) {
+			if (tmpListMap.get((int)i).get("name").toString().contains("Android")) {
+				installbtn.setVisibility(View.VISIBLE);
+				uninstallbtn.setVisibility(View.VISIBLE);
+				appversion.setText("version: ".concat(tmpListMap.get((int)i).get("version").toString()));
+				if (_getPackageVersion(appsList.get((int)currentpos).get("package").toString()).equals("none")) {
+					installbtn.setText("install");
+					_LayoutDesigner(installbtn, 16, 16, 16, 16, "#E53935", 0, "#000000", 8);
+					if (appsList.get((int)currentpos).get("price").toString().contains("€") || appsList.get((int)currentpos).get("price").toString().contains("$")) {
+						_LayoutDesigner(installbtn, 16, 16, 16, 16, "#FF8500", 0, "#000000", 8);
+						installbtn.setText("buy at ".concat(appsList.get((int)currentpos).get("price").toString()));
+					}
 					installbtn.setVisibility(View.VISIBLE);
-					uninstallbtn.setVisibility(View.VISIBLE);
-					appversion.setText("version: ".concat(tmpListMap.get((int)i).get("version").toString()));
-					if (_getPackageVersion(appsList.get((int)currentpos).get("package").toString()).equals("none")) {
-						installbtn.setText("install");
-						_LayoutDesigner(installbtn, 16, 16, 16, 16, "#E53935", 0, "#000000", 8);
-						if (appsList.get((int)currentpos).get("price").toString().contains("€") || appsList.get((int)currentpos).get("price").toString().contains("$")) {
-							_LayoutDesigner(installbtn, 16, 16, 16, 16, "#FF8500", 0, "#000000", 8);
-							installbtn.setText("buy at ".concat(appsList.get((int)currentpos).get("price").toString()));
-						}
-						installbtn.setVisibility(View.VISIBLE);
-						uninstallbtn.setVisibility(View.GONE);
+					uninstallbtn.setVisibility(View.GONE);
+				}
+				else {
+					if ((_getVersionInt(_getPackageVersion(appsList.get((int)currentpos).get("package").toString())) == _getVersionInt(tmpListMap.get((int)i).get("version").toString())) || (_getVersionInt(_getPackageVersion(appsList.get((int)currentpos).get("package").toString())) > _getVersionInt(tmpListMap.get((int)i).get("version").toString()))) {
+						installbtn.setText("launch");
 					}
 					else {
-						if ((_getVersionInt(_getPackageVersion(appsList.get((int)currentpos).get("package").toString())) == _getVersionInt(tmpListMap.get((int)i).get("version").toString())) || (_getVersionInt(_getPackageVersion(appsList.get((int)currentpos).get("package").toString())) > _getVersionInt(tmpListMap.get((int)i).get("version").toString()))) {
-							installbtn.setText("launch");
-						}
-						else {
-							installbtn.setText("update");
-						}
+						installbtn.setText("update");
 					}
 				}
 			}
-		}catch(Exception e){
-			SketchwareUtil.showMessage(getContext().getApplicationContext(), "invalid platform json");
-			((ClipboardManager) getContext().getSystemService(getContext().getApplicationContext().CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", _json_parser(_map.get((int)_pos).get("platform").toString())));
 		}
 		sheetlayout.setVisibility(View.VISIBLE);
 		_bottomSheetSetState(true);
@@ -536,27 +537,89 @@ return;
 	
 	
 	public String _json_parser(final String _inp) {
-		try{
-			tmp = _inp.replace("={", "\": {\"").replace("=[", "\": [\"").replace("=", "\": \"").replace("}, ", "\"}, ");
-			// Use regex to replace more complex patterns
-			tmp = tmp.replaceAll("(\\w+)], ", "$1\"],");
-			tmp = tmp.replaceAll("\\{(\\w+)", "{\"$1");
-			tmp = tmp.replaceAll("(\\w+), (\\w+)", "$1\", \"$2");
+		try {
+			            // Remove outer brackets and split into individual objects
+			            String trimmedInput = _inp.substring(1, _inp.length() - 1);
+			            String[] objects = trimmedInput.split("\\},\\s*\\{");
 			
-			tmp = tmp.replaceAll("],(\\w+)", "],\"$1");
-			tmp = tmp.replaceAll("], (\\w+)", "], \"$1");
+			            JSONArray jsonArray = new JSONArray();
 			
+			            for (String objStr : objects) {
+				                // Clean up the object string
+				                objStr = objStr.replaceAll("[{}]", "").trim();
+				                String[] keyValuePairs = objStr.split("\\s*,\\s*");
+				
+				                JSONObject jsonObject = new JSONObject();
+				
+				                for (String pair : keyValuePairs) {
+					                    String[] keyValue = pair.split("\\s*=\\s*", 2);
+					                    if (keyValue.length != 2) continue;
+					
+					                    String key = keyValue[0].trim();
+					                    String value = keyValue[1].trim();
+					
+					                    // Handle different types of values
+					                    if (value.startsWith("[") && value.endsWith("]")) {
+						                        // Handle arrays
+						                        String arrayContent = value.substring(1, value.length() - 1);
+						                        JSONArray array = new JSONArray();
+						                        if (!arrayContent.isEmpty()) {
+							                            for (String item : arrayContent.split("\\s*,\\s*")) {
+								                                array.put(item.trim());
+								                            }
+							                        }
+						                        jsonObject.put(key, array);
+						                    } else if (value.equals("true") || value.equals("false")) {
+						                        // Handle booleans
+						                        jsonObject.put(key, Boolean.parseBoolean(value));
+						                    } else if (value.matches("\\d+(\\.\\d+)?")) {
+						                        // Handle numbers (integers or decimals)
+						                        if (value.contains(".")) {
+							                            jsonObject.put(key, Double.parseDouble(value));
+							                        } else {
+							                            jsonObject.put(key, Integer.parseInt(value));
+							                        }
+						                    } else if (value.isEmpty()) {
+						                        // Handle empty values (e.g., empty strings or null)
+						                        jsonObject.put(key, "");
+						                    } else {
+						                        // Handle strings (including URLs and versions)
+						                        jsonObject.put(key, value);
+						                    }
+					                }
+				
+				                jsonArray.put(jsonObject);
+				            }
 			
-			// Replace the remaining patterns
-			tmp = tmp.replace("}, ", "\"}, ");
-			tmp = tmp.replace("[\"]", "[]");
-			tmp = tmp.replace("}}", "\"}}");
-			tmp = tmp.replace("\"\"}", "\"}");
-			tmp = tmp.replace("}]", "\"}]");
-			return tmp;
-		}catch(Exception e){
-			return _inp;
-		}
+			            return jsonArray.toString(2); // Pretty-print with 2-space indentation
+			        } catch (Exception e) {
+			            System.err.println("Error converting to JSON: " + e.getMessage());
+			            return "{}";
+			        }
+		
+		/*
+try{
+tmp = _inp.replace("={", "\": {\"").replace("=[", "\": [\"").replace("=", "\": \"").replace("}, ", "\"}, ");
+// Use regex to replace more complex patterns
+tmp = tmp.replaceAll("(\\w+)], ", "$1\"],");
+tmp = tmp.replaceAll("\\{(\\w+)", "{\"$1");
+tmp = tmp.replaceAll("(\\w+), (\\w+)", "$1\", \"$2");
+
+tmp = tmp.replaceAll("],(\\w+)", "],\"$1");
+tmp = tmp.replaceAll("], (\\w+)", "], \"$1");
+
+
+// Replace the remaining patterns
+tmp = tmp.replace("}, ", "\"}, ");
+tmp = tmp.replace("[\"]", "[]");
+tmp = tmp.replace("}}", "\"}}");
+tmp = tmp.replace("\"\"}", "\"}");
+tmp = tmp.replace("}]", "\"}]");
+return tmp;
+}catch(Exception e){
+return _inp;
+}
+*/
 	}
 	
 	

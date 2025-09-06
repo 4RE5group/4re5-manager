@@ -160,7 +160,6 @@ public class ModmanagerActivity extends AppCompatActivity {
 			sp.edit().remove("returnValue").commit();
 		}
 		map = new HashMap<>();
-		SketchwareUtil.showMessage(getApplicationContext(), "This feature is still under development");
 		try{
 			if (sp.contains("sharedModMap")) {
 				listview1.setAdapter(new Listview1Adapter(options));
@@ -509,13 +508,7 @@ public class ModmanagerActivity extends AppCompatActivity {
 						}catch(Exception e){
 							 
 						}
-						isRange.setOnTouchListener(new View.OnTouchListener(){
-							@Override
-							public boolean onTouch(View _view, MotionEvent _motionEvent){
-								rangeValue.setText(String.valueOf((long)(isRange.getProgress())));
-								return true;
-							}
-						});
+						rangeValue.setText(String.valueOf((long)(isRange.getProgress())));
 					}
 					else {
 						labelType.setVisibility(View.VISIBLE);
@@ -534,6 +527,15 @@ public class ModmanagerActivity extends AppCompatActivity {
 					}
 				}
 			});
+			/*
+isRange.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		// Update the TextView with the current progress value
+		rangeValue.setText(progress);
+	}
+});
+*/
 			
 			return _view;
 		}
