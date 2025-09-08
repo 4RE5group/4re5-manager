@@ -1,2 +1,89 @@
-hello world!
-4re5 group on top
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4re5 manager | main</title>
+
+    <style>
+        :root {
+            --color-text: #798ca3;
+            --color-background1: #263345;
+            --color-background2: #202a3b;
+            --color-dark: #1b2430;
+            --color-darker: #1e1e1e;
+            --color-orange: #FF8500;
+
+            --menu-width: 50px;
+            --menu-width-open: calc(35px + 107px + var(--menu-width));
+        }
+
+        body {
+            overflow: hidden;
+            padding: 0px;
+            margin: 0px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .menu {
+            padding-top: 7px;
+            width: var(--menu-width);
+            justify-content: center;
+            height: 100vh;
+            background: var(--color-darker);
+            flex-direction: row;
+            display: flex;
+
+            #menu-icon:hover {
+                cursor: pointer;
+            }
+
+            .menu-container {
+                width: 100px;
+                height: 100vh;
+            }
+        }
+
+        .content {
+            width: calc(100% - var(--menu-width));
+            height: 100vh;
+            background: var(--color-background1);
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <svg id="menu-icon" width="35px" height="35px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="var(--color-text)"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <g data-name="Layer 2"> <g data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g data-name="icons Q2"> <g> <path d="M42,12a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,24a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,36a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> </g> </g> </g> </g></svg>
+        <div class="menu-container" style="display: none;">
+
+        </div>
+    </div>
+
+    <div class="content">
+        content
+    </div>
+
+    <script>
+        var icon_menu_close = `<g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g>  <g id="Layer_2" data-name="Layer 2"> <g id="invisible_box" data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g id="icons_Q2" data-name="icons Q2"> <path d="M26.8,24,37.4,13.5a2.1,2.1,0,0,0,.2-2.7,1.9,1.9,0,0,0-3-.2L24,21.2,13.4,10.6a1.9,1.9,0,0,0-3,.2,2.1,2.1,0,0,0,.2,2.7L21.2,24,10.6,34.5a2.1,2.1,0,0,0-.2,2.7,1.9,1.9,0,0,0,3,.2L24,26.8,34.6,37.4a1.9,1.9,0,0,0,3-.2,2.1,2.1,0,0,0-.2-2.7Z"></path> </g> </g> </g>`;
+        var icon_menu_open = ``;
+
+        var menu_icon = document.getElementById("menu-icon");
+        var menu = document.querySelector(".menu");
+        var menu_container = document.querySelector(".menu-container");
+
+        menu_icon.addEventListener("click", function () {
+            if (menu.style.width == "var(--menu-width-open)")
+            {
+                menu.style.width = "var(--menu-width)";
+                menu_container.style.display = "none";
+            }
+            else
+            {
+                menu.style.width = "var(--menu-width-open)";
+                menu_container.style.display = "flex";
+            }
+            });
+    </script>
+</body>
+</html>

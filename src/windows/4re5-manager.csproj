@@ -21,15 +21,16 @@
     <AssemblyCopyright>Copyright 4re5 group © 2025</AssemblyCopyright>
     <Copyright>Copyright 4re5 group © 2025</Copyright>
     <Configuration>Release</Configuration>
-    <AssemblyVersion>1.8</AssemblyVersion>
-    <FileVersion>1.8 beta</FileVersion>
-    <Version>1.8-beta</Version>
+    <AssemblyVersion>1.9</AssemblyVersion>
+    <FileVersion>1.9.0.0</FileVersion>
+    <Version>1.9-beta</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
     <EmbeddedResource Include="app\main.html" />
   </ItemGroup>
 </Project>

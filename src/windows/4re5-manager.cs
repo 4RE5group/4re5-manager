@@ -4,55 +4,81 @@ using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
 using System.Reflection;
+using System.Collections.Generic;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
 
 namespace com.ares
 {
     public partial class MainWindow : Form
     {
         private string home_path;
+        private string app_version;
+        private WebView2 webView;
 
         public static string GetEmbeddedHtml(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
             {
-                return reader.ReadToEnd();
+                if (stream == null)
+                    throw new FileNotFoundException($"Embedded resource '{resourceName}' not found.");
+
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
             }
         }
+
         public MainWindow()
         {
-            home_path = Environment.GetEnvironmentVariable("userprofile") + @"\4re5 group\";
+            // InitializeComponent(); // Uncomment if you have a designer file
+
+            // Make app path
+            home_path = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive"), @"Program Files\4re5 group");
             if (!Directory.Exists(home_path))
             {
                 Directory.CreateDirectory(home_path);
             }
+
+            // Get app version
+            var versionInfo = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            app_version = versionInfo?.InformationalVersion.Split('+')[0].Replace("-", " ") ?? "1.0.0";
+
             this.Name = "4re5 manager";
-            this.Text = "4re5 manager - v1.0";
-            this.Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            this.Text = $"4re5 manager - v{app_version}";
+            this.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             this.MinimumSize = new Size(700, 450);
-            InitializeWebBrowser();
+            this.MaximumSize = this.MinimumSize;
+            this.BackColor = Color.Black;
+
+            InitializeWebView2Async();
         }
 
-        private void InitializeWebBrowser()
+        private async void InitializeWebView2Async()
         {
-            WebBrowser webBrowser = new WebBrowser();
-            webBrowser.Dock = DockStyle.Fill;
-            webBrowser.Size = this.Size;
-            webBrowser.ScriptErrorsSuppressed = true;
-            var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-            // foreach (var name in names)
-            // {
-                // Console.WriteLine(name);
-            // }
+            webView = new WebView2
+            {
+                Dock = DockStyle.Fill,
+            };
+            this.Controls.Add(webView);
 
-            string mainContent = GetEmbeddedHtml("main.html");
-            webBrowser.DocumentText = mainContent;
-            this.Controls.Add(webBrowser);
+            try
+            {
+                await webView.EnsureCoreWebView2Async();
+                string mainContent = GetEmbeddedHtml("4re5-manager.app.main.html");
+                webView.CoreWebView2.NavigateToString(mainContent);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load UI: {ex.Message}");
+                this.Close();
+            }
         }
 
         [STAThread]
-        static void Main()
+        static int Main(string[] argv)
         {
             try
             {
@@ -76,9 +102,10 @@ namespace com.ares
             }
             catch (Exception ex)
             {
-                File.WriteAllText("crash.log", ex.ToString());
-                MessageBox.Show($"An error occurred: {ex.Message}");
+                MessageBox.Show($"Could not launch UI: {ex.Message}");
+                return 1;
             }
+            return 0;
         }
     }
 }
