@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4re5 manager | main</title>
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" data-tag="font">
     <style>
         :root {
             --color-text: #798ca3;
@@ -19,6 +19,8 @@
         }
 
         body {
+            font-family: Inter;
+            font-size: 16px;
             overflow: hidden;
             padding: 0px;
             margin: 0px;
@@ -27,21 +29,43 @@
         }
 
         .menu {
-            padding-top: 7px;
             width: var(--menu-width);
             justify-content: center;
             height: 100vh;
             background: var(--color-darker);
-            flex-direction: row;
+            flex-direction: column;
             display: flex;
 
             #menu-icon:hover {
                 cursor: pointer;
             }
+            #menu-icon {
+                margin: 8px 0px 0px 8px;
+            }
 
             .menu-container {
-                width: 100px;
+                width: 100%;
                 height: 100vh;
+                display: flex;
+                flex-direction: column;
+                margin-top: 20px;
+                padding-left: 8px;
+                overflow: hidden;
+                gap: 20px;
+
+                span {
+                    text-wrap: nowrap;
+                    gap: 10px;
+                    align-items: center;
+                    color: white;
+                    width: var(--menu-width-open);
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                span:hover {
+                    cursor: pointer;
+                }
             }
         }
 
@@ -49,41 +73,161 @@
             width: calc(100% - var(--menu-width));
             height: 100vh;
             background: var(--color-background1);
+
+            .panel {
+                height: 100vh;
+            }
+
+            #appview {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                width: 100%;
+                padding: 20px;
+                gap: 10px;
+                overflow-y: scroll;
+                height: 100%;
+
+                .app {
+                    flex-direction: column;
+                    display: flex;
+                    align-items: center;
+                    width: 100px;
+
+                    img {
+                        width: 100px;
+                        height: 70px;
+                        object-fit: contain;
+                    }
+
+                    span {
+                        color: white;
+                        height: 50px;
+                    }
+                }
+
+                .app:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+        .bottomsheet {
+            z-index: 999;
+            position: relative;
+            width: 100%;
+            background-color: #212121;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 40px 40px 0px 0px;
+
+
+            .indicator {
+                border-radius: 100px;
+                background-color: #eeeeee;
+                height: 6px;
+                width: 40px;
+                margin-top: 12px;
+                margin-bottom: 18px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="menu">
-        <svg id="menu-icon" width="35px" height="35px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="var(--color-text)"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <g data-name="Layer 2"> <g data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g data-name="icons Q2"> <g> <path d="M42,12a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,24a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,36a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> </g> </g> </g> </g></svg>
-        <div class="menu-container" style="display: none;">
-
+        <svg id="menu-icon" width="35px" height="35px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="var(--color-text)"></svg>
+        <div class="menu-container">
+            <span>
+                <svg fill="#ffffff" height="35px" width="35px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <g> <g> <path d="M430.184,194.351v-93.802c0-10.345-8.387-18.732-18.732-18.732h-97.561C305.091,35.294,264.136,0,215.091,0 c-49.043,0-89.998,35.294-98.799,81.818H18.732C8.387,81.818,0,90.204,0,100.549v110.786c0,10.345,8.387,18.732,18.732,18.732 c34.785,0,63.085,28.3,63.085,63.086s-28.3,63.085-63.085,63.085C8.387,356.237,0,364.624,0,374.969v118.299 C0,503.613,8.387,512,18.732,512h114.543c10.345,0,18.732-8.387,18.732-18.732c0-34.785,28.3-63.086,63.085-63.086 s63.086,28.3,63.086,63.086c0,10.345,8.387,18.732,18.732,18.732h114.543c10.345,0,18.732-8.387,18.732-18.732V391.951 c46.523-8.801,81.816-49.756,81.816-98.8C512,244.108,476.707,203.153,430.184,194.351z"></path> </g> </g> </g></svg>
+                Mods
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24" width="35px" height="35px" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path d="M17 18.9999C18.2496 18.9715 19.4432 18.4759 20.3456 17.611C21.2481 16.7462 21.7939 15.5746 21.8754 14.3273C21.957 13.0801 21.5684 11.8475 20.7863 10.8725C20.0042 9.89749 18.8852 9.25073 17.65 9.05975C17.1768 7.73466 16.2529 6.61822 15.0399 5.90521C13.8269 5.19221 12.4019 4.92799 11.0139 5.15912C9.62597 5.39024 8.36341 6.102 7.4469 7.16962C6.53039 8.23724 6.01826 9.59301 6 10.9999C4.93913 10.9999 3.92172 11.4212 3.17157 12.1713C2.42142 12.9215 2 13.9391 2 14.9999C2 16.0608 2.42142 17.0782 3.17157 17.8283C3.92172 18.5785 4.93913 18.9999 6 18.9999H17Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                4re5net
+            </span>
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="35px" height="35px" fill="#ffffff" viewBox="0 0 24 24" stroke="#ffffff"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></g></svg>
+                Home
+            </span>
+            <span>
+                <svg fill="#ffffff" width="35px" height="35px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="0.00024000000000000003"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g><path d="M20.995 6.9a.998.998 0 0 0-.548-.795l-8-4a1 1 0 0 0-.895 0l-8 4a1.002 1.002 0 0 0-.547.795c-.011.107-.961 10.767 8.589 15.014a.987.987 0 0 0 .812 0c9.55-4.247 8.6-14.906 8.589-15.014zM12 19.897V12H5.51a15.473 15.473 0 0 1-.544-4.365L12 4.118V12h6.46c-.759 2.74-2.498 5.979-6.46 7.897z"></path></g></svg>
+                Authenticator
+            </span>
+            <span>
+                <svg fill="#ffffff" width="35px" height="35px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path d="M1703.534 960c0-41.788-3.84-84.48-11.633-127.172l210.184-182.174-199.454-340.856-265.186 88.433c-66.974-55.567-143.323-99.389-223.85-128.415L1158.932 0h-397.78L706.49 269.704c-81.43 29.138-156.423 72.282-223.962 128.414l-265.073-88.32L18 650.654l210.184 182.174C220.39 875.52 216.55 918.212 216.55 960s3.84 84.48 11.633 127.172L18 1269.346l199.454 340.856 265.186-88.433c66.974 55.567 143.322 99.389 223.85 128.415L761.152 1920h397.779l54.663-269.704c81.318-29.138 156.424-72.282 223.963-128.414l265.073 88.433 199.454-340.856-210.184-182.174c7.793-42.805 11.633-85.497 11.633-127.285m-743.492 395.294c-217.976 0-395.294-177.318-395.294-395.294 0-217.976 177.318-395.294 395.294-395.294 217.977 0 395.294 177.318 395.294 395.294 0 217.976-177.317 395.294-395.294 395.294" fill-rule="evenodd"></path> </g></svg>
+                Settings
+            </span>
         </div>
     </div>
 
     <div class="content">
-        content
+        <div class="panel" id="home">
+            <span style="color: var(--color-text);">4re5 apps</span>
+            <div id="appview">
+                <!-- apps here -->
+            </div>
+            <div class="bottomsheet">
+                <div class="indicator"></div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // 4re5 group, all rights reserved
         var icon_menu_close = `<g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g>  <g id="Layer_2" data-name="Layer 2"> <g id="invisible_box" data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g id="icons_Q2" data-name="icons Q2"> <path d="M26.8,24,37.4,13.5a2.1,2.1,0,0,0,.2-2.7,1.9,1.9,0,0,0-3-.2L24,21.2,13.4,10.6a1.9,1.9,0,0,0-3,.2,2.1,2.1,0,0,0,.2,2.7L21.2,24,10.6,34.5a2.1,2.1,0,0,0-.2,2.7,1.9,1.9,0,0,0,3,.2L24,26.8,34.6,37.4a1.9,1.9,0,0,0,3-.2,2.1,2.1,0,0,0-.2-2.7Z"></path> </g> </g> </g>`;
-        var icon_menu_open = ``;
+        var icon_menu_open = `<g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <g data-name="Layer 2"> <g data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g data-name="icons Q2"> <g> <path d="M42,12a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,24a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,36a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> </g> </g> </g> </g>`;
 
         var menu_icon = document.getElementById("menu-icon");
         var menu = document.querySelector(".menu");
         var menu_container = document.querySelector(".menu-container");
+        var app_view = document.getElementById("appview");
+        var bottomsheet = document.querySelector(".bottomsheet");
+
+        // init menu icon
+        menu_icon.innerHTML = icon_menu_open;
 
         menu_icon.addEventListener("click", function () {
+            // if opened
             if (menu.style.width == "var(--menu-width-open)")
             {
                 menu.style.width = "var(--menu-width)";
-                menu_container.style.display = "none";
+                menu_icon.innerHTML = icon_menu_open;
             }
-            else
+            else // if closed
             {
                 menu.style.width = "var(--menu-width-open)";
-                menu_container.style.display = "flex";
+                menu_icon.innerHTML = icon_menu_close;
             }
+        });
+        window.chrome.webview.addEventListener("message", (event) => {
+            name = event.data.split(":")[0];
+            switch (name)
+            {
+                case "GetRepo":
+                    LoadApps(JSON.parse(event.data.replaceAll(name+":", "")));
+                    break;
+            }
+        });
+        // app view loader
+        window.addEventListener("load", function (){
+            window.chrome.webview.hostObjects.aresAPI.GetRepo(false);  
+        });
+
+        function LoadApps(json) {
+            json.forEach(app => {
+                app_view.innerHTML += `
+                <div class="app" onclick="viewApp('${app.package}')">
+                    <img src="${(app.image == "")?"https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/default.png":app.image}">
+                    <span>${app.name}</span>
+                </div>`;
             });
+        }
+
+        function viewApp(package)
+        {
+            bottomsheet.style.transform = "translateY(-200px)";
+        }
+
+        
     </script>
 </body>
 </html>

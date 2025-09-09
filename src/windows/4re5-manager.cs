@@ -12,11 +12,10 @@ namespace com.ares
 {
     public partial class MainWindow : Form
     {
-        private string home_path;
         private string app_version;
         private WebView2 webView;
 
-        public static string GetEmbeddedHtml(string resourceName)
+        public static string GetEmbeddedFile(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
@@ -30,25 +29,28 @@ namespace com.ares
                 }
             }
         }
+        public static Icon GetEmbeddedIcon(string resourceName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                    throw new FileNotFoundException($"Embedded resource '{resourceName}' not found.");
+
+                return new Icon(stream);
+            }
+        }
 
         public MainWindow()
         {
-            // InitializeComponent(); // Uncomment if you have a designer file
-
-            // Make app path
-            home_path = Path.Combine(Environment.GetEnvironmentVariable("SystemDrive"), @"Program Files\4re5 group");
-            if (!Directory.Exists(home_path))
-            {
-                Directory.CreateDirectory(home_path);
-            }
-
             // Get app version
-            var versionInfo = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var executable = Assembly.GetExecutingAssembly();
+            var versionInfo = executable?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             app_version = versionInfo?.InformationalVersion.Split('+')[0].Replace("-", " ") ?? "1.0.0";
 
             this.Name = "4re5 manager";
             this.Text = $"4re5 manager - v{app_version}";
-            this.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            this.Icon = GetEmbeddedIcon("4re5-manager.icon.ico");
             this.MinimumSize = new Size(700, 450);
             this.MaximumSize = this.MinimumSize;
             this.BackColor = Color.Black;
@@ -67,7 +69,10 @@ namespace com.ares
             try
             {
                 await webView.EnsureCoreWebView2Async();
-                string mainContent = GetEmbeddedHtml("4re5-manager.app.main.html");
+                // load 4re5-manager api
+                webView.CoreWebView2.AddHostObjectToScript("aresAPI", new aresAPI(webView.CoreWebView2));
+                
+                string mainContent = GetEmbeddedFile("4re5-manager.app.main.html");
                 webView.CoreWebView2.NavigateToString(mainContent);
             }
             catch (Exception ex)
