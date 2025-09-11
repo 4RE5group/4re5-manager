@@ -15,10 +15,11 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral() // jcenter() is deprecated
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
