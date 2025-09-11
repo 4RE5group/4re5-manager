@@ -38,7 +38,7 @@ sudo dpkg -i release.deb
 
 Keep track of lastest softwares updates with ease with **4re5 manager**
 - Everything accessible from a single click
-- No ads, no clickbait
+- No ads
 - Frequent updates
 - Maintained security patches
 
@@ -46,9 +46,17 @@ Keep track of lastest softwares updates with ease with **4re5 manager**
 <br><br>
 
 ## Todo list
-- [ ] Implement Windows version 
-- [ ] Implement Linux version
+- [ ] Windows version 
     - [ ] Implement authentification system
-    - [ ] Implement cli commands
+    - [ ] Handle server, cli and app types
+
+- [x] Android
+    - [x] Implement authentification system
+    - [ ] Handle server, cli and app types
+
+- [x] Linux version
+    - [ ] Implement authentification system
+    - [x] Implement cli commands
+    - [ ] Handle server, cli and app types
 
 Made with ♥ by 4re5 group
