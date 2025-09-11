@@ -11,7 +11,7 @@ using System;
 using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("4re5 group")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright 4re5 group © 2025")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.9.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.9-beta+1190ba0996ce50d0d6d7f89f6c77536cf1adfdb1")]

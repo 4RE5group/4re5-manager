@@ -16,4 +16,4 @@ run:		all
 
 .PHONY: all run
 
-# dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
+# dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true && sudo .\bin\Release\net8.0-windows\win-x64\publish\4re5-manager.exe
