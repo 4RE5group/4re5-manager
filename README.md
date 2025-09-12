@@ -1,5 +1,9 @@
 # 4re5-manager
 
+![windows build](https://github.com/4re5group/4re5-manager/actions/workflows/windows.yml/badge.svg)
+![android build](https://github.com/4re5group/4re5-manager/actions/workflows/android.yml/badge.svg)
+![linux build](https://github.com/4re5group/4re5-manager/actions/workflows/linux.yml/badge.svg)
+
 Official 4re5 app downloader &amp; updater with 4re5 security features for authentification and more
 
 ## Installation
@@ -58,5 +62,6 @@ Keep track of lastest softwares updates with ease with **4re5 manager**
     - [ ] Implement authentification system
     - [x] Implement cli commands
     - [ ] Handle server, cli and app types
+
 
 Made with ♥ by 4re5 group
