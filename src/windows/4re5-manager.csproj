@@ -6,6 +6,7 @@
     <PlatformTarget>anycpu</PlatformTarget>
     <UseWindowsForms>true</UseWindowsForms>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
     <PackageId>com.ares</PackageId>
     <Product>4re5 Manager</Product>
@@ -35,3 +36,4 @@
     <EmbeddedResource Include="icon.ico" />
   </ItemGroup>
 </Project>
+
