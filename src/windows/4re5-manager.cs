@@ -14,6 +14,7 @@ namespace com.ares
     {
         private string app_version;
         private WebView2 webView;
+        private bool debug;
 
         public static string GetEmbeddedFile(string resourceName)
         {
@@ -41,8 +42,11 @@ namespace com.ares
             }
         }
 
-        public MainWindow()
+        public MainWindow(bool _debug)
         {
+            // set the debug flag
+            debug = _debug;
+
             // Get app version
             var executable = Assembly.GetExecutingAssembly();
             var versionInfo = executable?.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
@@ -51,8 +55,7 @@ namespace com.ares
             this.Name = "4re5 manager";
             this.Text = $"4re5 manager - v{app_version}";
             this.Icon = GetEmbeddedIcon("4re5-manager.icon.ico");
-            this.MinimumSize = new Size(700, 450);
-            this.MaximumSize = this.MinimumSize;
+            this.MinimumSize = new Size(800, 550);
             this.BackColor = Color.Black;
 
             InitializeWebView2Async();
@@ -71,9 +74,16 @@ namespace com.ares
                 await webView.EnsureCoreWebView2Async();
                 // load 4re5-manager api
                 webView.CoreWebView2.AddHostObjectToScript("aresAPI", new aresAPI(webView.CoreWebView2));
+
+                // disable devtools
+                if (!debug)
+                    webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
                 
-                string mainContent = GetEmbeddedFile("4re5-manager.app.main.html");
-                webView.CoreWebView2.NavigateToString(mainContent);
+                webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+
+                // load pages
+                string spashContent = GetEmbeddedFile("4re5-manager.app.splash.html");
+                webView.CoreWebView2.NavigateToString(spashContent);
             }
             catch (Exception ex)
             {
@@ -85,31 +95,39 @@ namespace com.ares
         [STAThread]
         static int Main(string[] argv)
         {
-            try
+            bool debug = false;
+            if (argv.Length >= 1)
             {
-                // Set AUMID for current process
-                string regPath = @"Software\Classes\AppUserModelId\com.ares";
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(regPath, true))
+                if (argv[0] == "--debug")
+                    debug = true;
+                else
+                    MessageBox.Show("Invalid cli argument: "+argv[0]);
+            }
+            try
                 {
-                    if (key == null)
+                    // Set AUMID for current process
+                    string regPath = @"Software\Classes\AppUserModelId\com.ares";
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(regPath, true))
                     {
-                        using (RegistryKey newKey = Registry.CurrentUser.CreateSubKey(regPath))
+                        if (key == null)
                         {
-                            newKey.SetValue("DisplayName", "4re5 manager");
-                            newKey.SetValue("ApplicationName", "4re5 manager");
+                            using (RegistryKey newKey = Registry.CurrentUser.CreateSubKey(regPath))
+                            {
+                                newKey.SetValue("DisplayName", "4re5 manager");
+                                newKey.SetValue("ApplicationName", "4re5 manager");
+                            }
                         }
                     }
-                }
 
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new MainWindow());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Could not launch UI: {ex.Message}");
-                return 1;
-            }
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new MainWindow(debug));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not launch UI: {ex.Message}");
+                    return 1;
+                }
             return 0;
         }
     }

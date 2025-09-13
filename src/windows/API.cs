@@ -17,6 +17,21 @@ namespace com.ares
         public string APP_DIR;
         public static string REPO_URL = "https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/repo.json";
 
+        public void LoadMain()
+        {
+            string mainContent = MainWindow.GetEmbeddedFile("4re5-manager.app.main.html");
+            webview.NavigateToString(mainContent);
+        }
+
+        public void Install(string package, string url)
+        {
+            string repo_path = Path.Combine(APP_DIR, "repo.json");
+            string package_path = Path.Combine(APP_DIR, "packages");
+            if (!Directory.Exists(APP_DIR))
+                Directory.CreateDirectory(APP_DIR);
+            MessageBox.Show(package+":"+url);
+        }
+
         public void GetRepo(bool force_updating)
         {
             // check if APP dir exists
@@ -38,7 +53,7 @@ namespace com.ares
                 }
             }
             string repo_content = File.ReadAllText(repo_path);
-            sendMessage("GetRepo",repo_content);
+            sendMessage("GetRepo", repo_content);
         }
 
         private void sendMessage(string name, string message)

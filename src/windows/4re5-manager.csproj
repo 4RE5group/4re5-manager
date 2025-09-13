@@ -32,7 +32,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
-    <EmbeddedResource Include="app\main.html" />
+    <EmbeddedResource Include="app\main.html"/>
+    <EmbeddedResource Include="app\splash.html"/>
     <EmbeddedResource Include="icon.ico" />
   </ItemGroup>
 </Project>
