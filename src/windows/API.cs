@@ -46,7 +46,35 @@ namespace com.ares
 
         public void launchPackage(string package)
         {
-            // string package_manifest = P
+            if (Security.Sanitize(package) != package)
+            {
+                sendMessage("launchPackage", "error: path inejction protection trigger");
+                return;
+            }
+            string manifest = Path.Combine(APP_DIR, "packages", package, "manifest");
+            Manifest app_manifest = JsonSerializer.Deserialize<Manifest>(File.ReadAllText(manifest), new JsonSerializerOptions
+            {
+                IncludeFields = true
+            });
+
+            // launch startup command
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C " + app_manifest.startUpFile;
+            process.StartInfo = startInfo;
+            process.Start();
+            process.WaitForExit();
+
+            int exitCode = process.ExitCode;
+            string errors = process.StandardError.ReadToEnd();
+            if (exitCode == 0)
+                sendMessage("launchPackage", "success");
+            else
+                sendMessage("launchPackage", "error: "+errors);
         }
 
         public void Install(string json)
@@ -119,13 +147,21 @@ namespace com.ares
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardError = true;
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = "/C call \"" + startupItem + "\"";
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
-                sendMessage("log", "Installer command has been executed!");
+
+                int exitCode = process.ExitCode;
+                string errors = process.StandardError.ReadToEnd();
+                if (exitCode == 0)
+                    sendMessage("log", "Installer command has been executed!");
+                else
+                    sendMessage("log", "error: "+errors);
+                
             }
             // execute command
             if (platform.installProcess != "none" && platform.installProcess != "")
@@ -133,13 +169,20 @@ namespace com.ares
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardError = true;
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = "/C " + platform.installProcess;
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
-                sendMessage("log", "post Installation command has been executed!");
+
+                int exitCode = process.ExitCode;
+                string errors = process.StandardError.ReadToEnd();
+                if (exitCode == 0)
+                    sendMessage("log", "post-installation command has been executed!");
+                else
+                    sendMessage("log", "error: "+errors);
             }
             // write manifest
             string manifest = Path.Combine(APP_DIR, "packages", current_app.package, "manifest");
