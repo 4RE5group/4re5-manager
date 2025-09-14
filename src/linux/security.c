@@ -1,7 +1,7 @@
 #include "defs.h"
 #include "config.h"
 
-#define FORBIDDEN_CHARACTERS "/~$:;!?%*^`"
+#define FORBIDDEN_CHARACTERS "/~$:;!?%*^`\\"
 #define REPLACEMENT_CHARACTER '-'
 
 /*

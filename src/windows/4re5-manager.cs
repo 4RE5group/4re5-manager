@@ -55,7 +55,7 @@ namespace com.ares
             this.Name = "4re5 manager";
             this.Text = $"4re5 manager - v{app_version}";
             this.Icon = GetEmbeddedIcon("4re5-manager.icon.ico");
-            this.MinimumSize = new Size(800, 550);
+            this.MinimumSize = new Size(900, 600);
             this.BackColor = Color.Black;
 
             InitializeWebView2Async();
