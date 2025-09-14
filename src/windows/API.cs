@@ -61,7 +61,6 @@ namespace com.ares
             Process process = new Process();
             ProcessStartInfo startInfo = new ProcessStartInfo();
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardError = true;
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.FileName = "cmd.exe";
             startInfo.Arguments = "/C " + app_manifest.startUpFile;
@@ -70,11 +69,10 @@ namespace com.ares
             process.WaitForExit();
 
             int exitCode = process.ExitCode;
-            string errors = process.StandardError.ReadToEnd();
             if (exitCode == 0)
                 sendMessage("launchPackage", "success");
             else
-                sendMessage("launchPackage", "error: "+errors);
+                sendMessage("launchPackage", "error: could not launch package");
         }
 
         public void Install(string json)
@@ -147,7 +145,6 @@ namespace com.ares
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardError = true;
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = "/C call \"" + startupItem + "\"";
@@ -156,11 +153,10 @@ namespace com.ares
                 process.WaitForExit();
 
                 int exitCode = process.ExitCode;
-                string errors = process.StandardError.ReadToEnd();
                 if (exitCode == 0)
-                    sendMessage("log", "Installer command has been executed!");
+                    sendMessage("log", "installer has been executed!");
                 else
-                    sendMessage("log", "error: "+errors);
+                    sendMessage("log", "error: could not launch installer");
                 
             }
             // execute command
@@ -169,20 +165,20 @@ namespace com.ares
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = "/C " + platform.installProcess;
+                startInfo.Arguments = "/C " + platform.installProcess.Replace("%s", startupItem);
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
 
                 int exitCode = process.ExitCode;
-                string errors = process.StandardError.ReadToEnd();
                 if (exitCode == 0)
                     sendMessage("log", "post-installation command has been executed!");
                 else
-                    sendMessage("log", "error: "+errors);
+                    sendMessage("log", "error: could not run post installation command");
             }
             // write manifest
             string manifest = Path.Combine(APP_DIR, "packages", current_app.package, "manifest");
