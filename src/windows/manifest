@@ -1,0 +1,16 @@
+{
+  "disabled": "false",
+  "name": "4re5 manager",
+  "description": "Official 4re5 app downloader\u0026updater with 4re5 security features for authentification and more",
+  "image": "https://github.com/4RE5group/4re5-manager/blob/main/assets/icon.png?raw=true",
+  "first_date": "2025-06-29",
+  "author": "4re5 group",
+  "price": "free",
+  "docs": "https://github.com/4RE5group/4re5-manager",
+  "github": "https://github.com/4RE5group/4re5-manager",
+  "license": "GNU GPL 3.0",
+  "package": "com.ares",
+  "version": "1.9 beta",
+  "isCmdTool": "false",
+  "startUpFile": "4re5-manager.exe"
+}

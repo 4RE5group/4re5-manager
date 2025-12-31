@@ -322,10 +322,42 @@
             cursor: pointer;
             text-align: center;
             transition: opacity 0.2s;
+            position: relative;
+            overflow: hidden;
         }
 
         .button:hover {
             opacity: 0.9;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 1;
+            display: none;
+        }
+
+        .button-text {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .stop-icon {
+            cursor: pointer;
+            fill: white;
+            width: 24px;
+            height: 24px;
+            display: none;
         }
 
         .author-tag {
@@ -518,7 +550,13 @@
         </div>
 
         <div class="action-buttons">
-            <button class="button" id="app_install" onclick="install()">install</button>
+            <button class="button" id="app_install" onclick="install()">
+                <div class="progress-bar" id="install_progress"></div>
+                <div class="button-text">
+                    <span id="install_text">install</span>
+                    <svg id="install_stop" class="stop-icon" onclick="cancelInstall(event)" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+                </div>
+            </button>
             <button class="button" id="app_uninstall" style="display: none;">uninstall</button>
         </div>
     </div>
@@ -562,6 +600,23 @@
             if (name == "log") // handle log message
             {
                 console.log("4re5-manager: "+message);
+                return;
+            }
+            if (name == "InstallProgress") {
+                var parts = message.split("|");
+                var progress = parseFloat(parts[0]);
+                var mbRead = parseFloat(parts[1]);
+                var mbTotal = parseFloat(parts[2]);
+                
+                var installProgress = document.getElementById("install_progress");
+                var installText = document.getElementById("install_text");
+                
+                if (installProgress) {
+                    installProgress.style.width = progress + "%";
+                }
+                if (installText) {
+                    installText.innerText = `${mbRead.toFixed(2)} MB / ${mbTotal.toFixed(2)} MB`;
+                }
                 return;
             }
             callStack.forEach(map => {
@@ -610,15 +665,6 @@
                         });
                     }
                 });
-                // check if manager is not installed
-                awaitMessage(result => {
-                    if (result === "-1.0" && manager_json != null) {
-                        awaitMessage(result2 => {
-                            console.log(result2);
-                        }, "Install", manager_json);
-                        console.log(manager_json);
-                    }
-                }, "GetPackageVersion", "com.ares");
             }, "GetRepo", false);
 
             // store current app version
@@ -675,6 +721,13 @@
             }
         }
 
+        function cancelInstall(event) {
+            event.stopPropagation();
+            awaitMessage(result => {
+                console.log("Cancel result: " + result);
+            }, "CancelInstall");
+        }
+
         function install()
         {
             if (current_app == null) {
@@ -682,14 +735,30 @@
                 return;
             }
             var installBtn = document.getElementById("app_install");
+            var installText = document.getElementById("install_text");
+            var installProgress = document.getElementById("install_progress");
+            var installStop = document.getElementById("install_stop");
+            
+            // Reset UI
+            installProgress.style.width = "0%";
+            installProgress.style.display = "block";
+            installStop.style.display = "block";
+            installBtn.onclick = null; // Disable click while installing
             
             awaitMessage(result => {
+                installProgress.style.display = "none";
+                installStop.style.display = "none";
+                installBtn.onclick = () => install(); // Re-enable click
+
                 if (result == "downloaded") {
-                    installBtn.innerText = "install";
+                    installText.innerText = "install";
                     alert("Download complete. Click install to run the installer.");
                 } else if (result == "success") {
                     alert("Installation successful!");
                     viewApp(current_app.package);
+                } else if (result == "cancelled") {
+                    installText.innerText = "install"; // Reset text
+                    alert("Installation cancelled.");
                 } else {
                     alert(result);
                     viewApp(current_app.package);
@@ -762,9 +831,9 @@
                             install();
                         };
                         if (platform.artifactType == "exe" || platform.artifactType == "msi")
-                            installBtn.innerText = "download";
+                            document.getElementById("install_text").innerText = "download";
                         else
-                            installBtn.innerText = "install";
+                            document.getElementById("install_text").innerText = "install";
 
                         uninstallBtn.style.display = "none";
                     }
@@ -780,16 +849,17 @@
                         float_last_version = parseFloat(float_last_version.replace("#", "."));
                         if (float_last_version > parseFloat(current_version))
                         {
-                            installBtn.innerText = "update";
+                            document.getElementById("install_text").innerText = "update";
                             installBtn.onclick = () => {
                                 install();
                             };
                         }
                         else
                         {
-                            installBtn.innerText = "launch";
+                            document.getElementById("install_text").innerText = "launch";
                             installBtn.onclick = () => {
-                                launch(current_app.package);
+                                if (current_app.package !== "com.ares")
+                                    launch(current_app.package);
                             };
                         }
                     }

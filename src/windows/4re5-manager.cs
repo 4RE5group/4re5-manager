@@ -75,29 +75,41 @@ namespace com.ares
             {
                 Dock = DockStyle.Fill,
             };
-            this.Controls.Add(webView);
+            Controls.Add(webView);
 
             try
             {
-                await webView.EnsureCoreWebView2Async();
-                // load 4re5-manager api
-                webView.CoreWebView2.AddHostObjectToScript("aresAPI", new aresAPI(webView.CoreWebView2, app_version));
+                // WebView2 MUST NOT use Program Files
+                string userDataDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "4re5-manager",
+                    "WebView2");
 
-                // disable devtools
+                Directory.CreateDirectory(userDataDir);
+
+                var env = await CoreWebView2Environment.CreateAsync(
+                    null,
+                    userDataDir,
+                    new CoreWebView2EnvironmentOptions("--disable-features=msWebOOUI"));
+
+                await webView.EnsureCoreWebView2Async(env);
+
+                webView.CoreWebView2.AddHostObjectToScript(
+                    "aresAPI",
+                    new aresAPI(webView.CoreWebView2, app_version));
+
                 if (!debug)
                     webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-                
+
                 webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 
-                // load pages
-                string spashContent = GetEmbeddedFile("4re5-manager.app.splash.html");
-                webView.CoreWebView2.SetVirtualHostNameToFolderMapping("app", "app", CoreWebView2HostResourceAccessKind.Allow);
-                webView.CoreWebView2.NavigateToString(spashContent);
+                string splashContent = GetEmbeddedFile("4re5-manager.app.splash.html");
+                webView.CoreWebView2.NavigateToString(splashContent);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load UI: {ex.Message}");
-                this.Close();
+                MessageBox.Show(ex.ToString(), "WebView2 error");
+                Close();
             }
         }
 

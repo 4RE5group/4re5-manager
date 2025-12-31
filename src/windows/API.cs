@@ -25,6 +25,7 @@ namespace com.ares
         public string APP_DIR;
         public static string REPO_URL = "https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/repo.json";
         private Dictionary<string, Process> runningProcesses = new Dictionary<string, Process>();
+        private CancellationTokenSource _cancellationTokenSource;
 
         public void LoadMain()
         {
@@ -162,6 +163,15 @@ namespace com.ares
             });
         }
 
+        public void CancelInstall()
+        {
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Cancel();
+                sendMessage("log", "Installation cancelled by user.");
+            }
+        }
+
         public void Install(string json)
         {
             Task.Run(async () =>
@@ -243,16 +253,70 @@ namespace com.ares
                         File.Delete(startupItem);
 
                     // download file
-                    using (var client = new HttpClient())
+                    _cancellationTokenSource = new CancellationTokenSource();
+                    try
                     {
-                        using (var s = await client.GetStreamAsync(platform.url))
+                        using (var client = new HttpClient())
                         {
-                            using (var fs = new FileStream(startupItem, FileMode.OpenOrCreate))
+                            using (var response = await client.GetAsync(platform.url, HttpCompletionOption.ResponseHeadersRead, _cancellationTokenSource.Token))
                             {
-                                await s.CopyToAsync(fs);
-                                sendMessage("log", "Binary has been downloaded!");
+                                response.EnsureSuccessStatusCode();
+                                var totalBytes = response.Content.Headers.ContentLength ?? -1L;
+                                var canReportProgress = totalBytes != -1;
+
+                                using (var s = await response.Content.ReadAsStreamAsync(_cancellationTokenSource.Token))
+                                {
+                                    using (var fs = new FileStream(startupItem, FileMode.Create, FileAccess.Write, FileShare.None))
+                                    {
+                                        var buffer = new byte[8192];
+                                        var isMoreToRead = true;
+                                        var totalRead = 0L;
+                                        var lastReportTime = DateTime.MinValue;
+
+                                        do
+                                        {
+                                            var read = await s.ReadAsync(buffer, 0, buffer.Length, _cancellationTokenSource.Token);
+                                            if (read == 0)
+                                            {
+                                                isMoreToRead = false;
+                                            }
+                                            else
+                                            {
+                                                await fs.WriteAsync(buffer, 0, read, _cancellationTokenSource.Token);
+                                                totalRead += read;
+
+                                                if (canReportProgress && (DateTime.Now - lastReportTime).TotalMilliseconds > 100)
+                                                {
+                                                    var progress = (double)totalRead / totalBytes * 100;
+                                                    var mbRead = totalRead / 1024.0 / 1024.0;
+                                                    var mbTotal = totalBytes / 1024.0 / 1024.0;
+                                                    sendMessage("InstallProgress", $"{progress:F2}|{mbRead:F2}|{mbTotal:F2}");
+                                                    lastReportTime = DateTime.Now;
+                                                }
+                                            }
+                                        } while (isMoreToRead);
+                                        sendMessage("log", "Binary has been downloaded!");
+                                    }
+                                }
                             }
                         }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        sendMessage("Install", "cancelled");
+                        if (File.Exists(startupItem)) File.Delete(startupItem);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        sendMessage("Install", "error: " + ex.Message);
+                        if (File.Exists(startupItem)) File.Delete(startupItem);
+                        return;
+                    }
+                    finally
+                    {
+                        _cancellationTokenSource.Dispose();
+                        _cancellationTokenSource = null;
                     }
 
                     // Verify checksum after download
