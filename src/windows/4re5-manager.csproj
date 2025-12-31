@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Optimize>true</Optimize>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <PackageId>com.ares</PackageId>
+    <Product>4re5 Manager</Product>
+    <AssemblyTitle>4re5 Manager</AssemblyTitle>
+    <AssemblyName>4re5-manager</AssemblyName>
+    <AssemblyProduct>4re5 Manager</AssemblyProduct>
+    <AssemblyDescription>Official 4re5 app downloader and updater with security features</AssemblyDescription>
+    <AssemblyCompany>4re5 group</AssemblyCompany>
+    <Authors>4re5 group</Authors>
+    <PackageProjectUrl>https://4re5group.github.io</PackageProjectUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryUrl>https://github.com/4re5group/4re5-manager</RepositoryUrl>
+    <AssemblyCopyright>Copyright 4re5 group © 2025</AssemblyCopyright>
+    <Copyright>Copyright 4re5 group © 2025</Copyright>
+    <Configuration>Release</Configuration>
+    <AssemblyVersion>1.9</AssemblyVersion>
+    <FileVersion>1.9.0.0</FileVersion>
+    <Version>1.9-beta</Version>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
+    <EmbeddedResource Include="app\main.html"/>
+    <EmbeddedResource Include="app\splash.html"/>
+    <EmbeddedResource Include="icon.ico" />
+  </ItemGroup>
+</Project>

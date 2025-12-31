@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Determine the CPU architecture
+ARCH=$(uname -m)
+APP_DIR="/usr/share/4re5 group"
+TARGET_DIR="$APP_DIR/packages/com.ares"
+BIN_DIR="/usr/sbin"
+BIN_NAME="4re5-manager"
+
+# Create target directories
+mkdir -p "$TARGET_DIR"
+chmod 777 "$APP_DIR"
+
+# Select the correct binary
+case "$ARCH" in
+    x86_64)
+	cp /opt/com.ares/$(echo $BIN_NAME)_x86_64 "$TARGET_DIR/$BIN_NAME"
+        ;;
+    *)
+        echo "Unsupported architecture: $ARCH" >&2
+        exit 1
+        ;;
+esac
+
+# Make the binary executable
+chmod +x "$TARGET_DIR/$BIN_NAME"
+
+# Create the symlink
+ln -sf "$TARGET_DIR/$BIN_NAME" "$BIN_DIR/$BIN_NAME"
+
+echo -e "\e[33mSuccessfully installed 4re5-manager!\e[0m"
+echo -e "\e[33mTo start using it, use the command '4re5-manager --help'\e[0m"
+
+exit 0

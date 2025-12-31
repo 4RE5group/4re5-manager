@@ -1,0 +1,4 @@
+src/linux/*.o
+src/windows/bin/*
+src/windows/obj/*
+src/windows/4re5-manager.exe

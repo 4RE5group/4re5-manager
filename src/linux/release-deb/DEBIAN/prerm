@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm -rf "$HOME/.4re5 group/bin/4re5-manager"
+rm -rf "$HOME/.4re5 group/packages/com.ares"
+
+exit 0

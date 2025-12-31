@@ -1,0 +1,101 @@
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+	<LinearLayout
+		android:id="@+id/linear1"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:padding="8dp"
+		android:background="#1E1E1E"
+		android:gravity="center_vertical"
+		android:orientation="horizontal">
+		<ImageView
+			android:id="@+id/imageview1"
+			android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:src="@drawable/ic_arrow_back_white"
+			android:scaleType="fitXY" />
+		<TextView
+			android:id="@+id/textview1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="mod name"
+			android:textSize="14sp"
+			android:textColor="#FFFFFF"
+			android:layout_weight="1" />
+		<ImageView
+			android:id="@+id/imageview2"
+			android:layout_width="25dp"
+			android:layout_height="25dp"
+			android:layout_marginRight="10dp"
+			android:src="@drawable/ic_favorite_outline_white"
+			android:scaleType="fitXY" />
+	</LinearLayout>
+	<LinearLayout
+		android:id="@+id/linear2"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:padding="8dp"
+		android:background="#263345"
+		android:orientation="vertical">
+		<LinearLayout
+			android:id="@+id/linear3"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:background="#1B2430"
+			android:orientation="horizontal">
+			<ImageView
+				android:id="@+id/selectedAppIcon"
+				android:layout_width="50dp"
+				android:layout_height="50dp"
+				android:src="@drawable/defaulticon"
+				android:scaleType="fitXY" />
+			<LinearLayout
+				android:id="@+id/linear4"
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:orientation="vertical"
+				android:layout_weight="1">
+				<TextView
+					android:id="@+id/SelectedAppName"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:text="No app selected"
+					android:textSize="12sp"
+					android:textColor="#FFFFFF"
+					android:layout_weight="1" />
+				<TextView
+					android:id="@+id/selectedAppPid"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="8dp"
+					android:paddingRight="8dp"
+					android:textSize="12sp"
+					android:textColor="#EEEEEE" />
+			</LinearLayout>
+			<Button
+				android:id="@+id/pickApp"
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:padding="8dp"
+				android:text="Pick App"
+				android:textSize="12sp"
+				android:textColor="#000000" />
+		</LinearLayout>
+		<ListView
+			android:id="@+id/listview1"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="8dp"
+			android:dividerHeight="0dp"
+			android:divider="@null"
+			android:choiceMode="none" />
+	</LinearLayout>
+</LinearLayout>

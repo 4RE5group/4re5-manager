@@ -1,0 +1,7 @@
+Package: com.ares
+Version: 1.9
+Section: base
+Priority: optional
+Architecture: all
+Maintainer: 4re5 group <contact@4re5.com>
+Description: Official 4re5 app downloader & updater with 4re5 security features for authentification and more

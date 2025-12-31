@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4re5 manager</title>
+    <style>
+        body {
+            padding: 0px;
+            margin: 0px;
+            background-color: black;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 100vh;
+
+            svg {
+                background-color: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img alt="logo" style="width: 270px; height: 100px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgsAAACzCAYAAAAHWV//AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsAAAA7AAWrWiQkAAASmSURBVHhe7d3RbqMwFEXRMP//z5mgFinqpKdATMf2XUtCzWOIUdhyqL3cbrf74wAAeOnP518AgJfEAgAQiQUAIBILAEAkFgCASCwAAJFYAAAisQAARGIBAIjEAgAQiQUAIBILAEAkFgCASCwAAJFYAAAisQAARGIBAIjEAgAQiQUAIBILAEAkFgCASCwAAJFYAAAisQAARGIBAIiWx3H/eElyv/fxMS3LOmR19TIOPflf14SxaOfdMTQW7VT/jv2OmQUY3Hqj2A6AK4gFmIhoAK4gFmBCogFoSSzAxAQD0IJYAAAisQCTM7sAvEssQAGCAXiHWIAiBANwlliAQgQDcIZYAAAisQDFmF0AjhILAEAkFqAgswvAEWIBAIjEAgAQiQUAIBILAEAkFgCASCwAAJFYAAAisQAARGIBAIjEAgAQLY/Duq879LI87rKsQ3bc6O9/Y5nidoxFP4xFP94di1mZWQAAIrEAAERiAQCIxAIAEIkFACASCwBAJBYAgEgsAACRWAAAIrEAAERiAQCI1kWwLSq+g70h2phpDfwz5zL6+38207mMzlhwNTMLAEAkFgCASCwAAJFYAAAisQAARGIBAIjEAgAQiQUAIBILAEAkFgCASCwAANG6iHc/i4p3bPS9FUZ//5vR18CfaQ3/ns6lN7+9P4Kx+P3PvBozCwAMbw2m7aA9sQDAVIRDe2IBgGkJhzbEAgAliIbzxAIApQiG48QCAOUIhmPEAgAlCYb9xAIAZQmGfcQCABCJBQBKM7vwM7EAAETrYtqSagfl2Yb9CPphLK5jb4gx2V/ie2YWAIBILAAAkVgAACKxAAAPnv34nliAgjzIBRwhFgCASCwAAJFYgGL8BAEcJRagEKEAnCEWAAYnArmaWIAi3FCAs8QCFCAU5meMuZJYgMm5iQDvEgswMaEAtCAWYEJrJAiFeow5VxELMBGRAFxBLMDgtkAQCaxcB1xBLMDA3Bh4xXVBa2IBBrZuqft8wEYw0JJYgImIBp4JBloRCzAh0cBmDQbRwLvEAkxMMLDZokE4cIZYgMkJBr4SDRy1Xi2+SXbwhdvGu19QxuG81jeHnsbCjW9srqX+mVmAIoQWcJZYAAAisQCFmF0AzhALUIxgAI4SCwBAJBYAgEgsQEF+igCOEAsAQCQWAIBILAAAkVgAACJ7QxTRywNtM+0NceZcRn//zzwk2Y6x6Ie9IV4zswAARGIBAIjEAgAQiQUAIBILAEAkFgCASCwAAJFYAAAisQAARGIBAIjEAgAQiQUAIBILAEAkFgCASCwAAJFYAAAisQAARGIBAB6WZfl8xVdiAQCIxAIAEIkFACASCwBAJBYAgEgsAFCe/4TIxAIAEIkFAEozq/AzsQBAWUJhH7EAAERiAYCSzCrsJxYAKEcoHCMWAChFKBwnFgAoYY0EoXCOWABgeiLhPWIBgGmZTWhDLAAwjS0OREJb6yd5/3gJAPAvMwsAQCQWAIBILAAAkVgAACKxAABEYgEAiMQCABCJBQAgEgsAQCQWAIBILAAAkVgAACKxAABEYgEAiMQCABCJBQAgEgsAQCQWAIBILAAAkVgAAILb7S98rvdVX3Yf8AAAAABJRU5ErkJggg==" />
+    <script>
+        // wait 3s for splash to finish
+        function gotoMain() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    window.chrome.webview.hostObjects.aresAPI.LoadMain();
+                    resolve("finished!");
+                }, 3000);
+            });
+        }
+        async function loader() {
+            const result = await gotoMain();
+            console.log(result);
+        }
+        loader();
+    </script>
+</body>
+</html>

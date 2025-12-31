@@ -1,0 +1,305 @@
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+	<LinearLayout
+		android:id="@+id/linear1"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:padding="8dp"
+		android:background="#1B2430"
+		android:gravity="center_vertical"
+		android:orientation="horizontal">
+		<ImageView
+			android:id="@+id/imageview1"
+			android:layout_width="35dp"
+			android:layout_height="35dp"
+			android:src="@drawable/ic_arrow_back_white"
+			android:scaleType="fitXY" />
+		<ImageView
+			android:id="@+id/deviceIcon"
+			android:layout_width="45dp"
+			android:layout_height="45dp"
+			android:src="@drawable/raspberry100_2"
+			android:scaleType="fitXY" />
+		<LinearLayout
+			android:id="@+id/deviceStatus"
+			android:layout_width="15dp"
+			android:layout_height="15dp"
+			android:padding="8dp"
+			android:background="#F44336"
+			android:orientation="horizontal"
+			android:translationX="-10.0dp"
+			android:translationY="15.0dp" />
+		<TextView
+			android:id="@+id/textview1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="-"
+			android:textSize="16sp"
+			android:textColor="#798CA3" />
+	</LinearLayout>
+	<ScrollView
+		android:id="@+id/vscroll1"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<LinearLayout
+			android:id="@+id/linear2"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="20dp"
+			android:background="#263345"
+			android:orientation="vertical">
+			<LinearLayout
+				android:id="@+id/linear3"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:padding="20dp"
+				android:background="#202A3B"
+				android:orientation="vertical">
+				<LinearLayout
+					android:id="@+id/linear4"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview2"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="IP"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_ip"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear5"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview4"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="Country"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_country"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear6"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview6"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="Device CPU Arch"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_arch"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear8"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview9"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="Join date"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_date"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear9"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview10"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="Type"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_type"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear10"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview12"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="City"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_city"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear11"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview14"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="Position"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<LinearLayout
+						android:id="@+id/linear13"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:orientation="vertical">
+						<TextView
+							android:id="@+id/device_lat"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:padding="8dp"
+							android:text="TextView"
+							android:textSize="12sp"
+							android:textColor="#3984D4" />
+						<TextView
+							android:id="@+id/device_long"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:padding="8dp"
+							android:text="TextView"
+							android:textSize="12sp"
+							android:textColor="#3984D4" />
+					</LinearLayout>
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/linear12"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:orientation="horizontal">
+					<TextView
+						android:id="@+id/textview16"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="Timezone"
+						android:textSize="14sp"
+						android:textColor="#798CA3"
+						android:layout_weight="1" />
+					<TextView
+						android:id="@+id/device_timezone"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:padding="8dp"
+						android:text="TextView"
+						android:textSize="12sp"
+						android:textColor="#798CA3" />
+				</LinearLayout>
+				<TextView
+					android:id="@+id/textview17"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:text="Device management"
+					android:textSize="16sp"
+					android:textColor="#798CA3" />
+				<Button
+					android:id="@+id/button1"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:text="Refresh"
+					android:textSize="12sp"
+					android:textColor="#000000" />
+				<Button
+					android:id="@+id/button2"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:text="Disconnect Device"
+					android:textSize="12sp"
+					android:textColor="#000000" />
+				<Button
+					android:id="@+id/button3"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:text="Get a Shell"
+					android:textSize="12sp"
+					android:textColor="#000000" />
+			</LinearLayout>
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>

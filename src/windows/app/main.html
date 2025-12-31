@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4re5 manager | main</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" data-tag="font">
+    <style>
+        :root {
+            --color-background: #263345;
+            --color-surface: #212121;
+            --color-text-primary: #FFFFFF;
+            --color-text-secondary: #798CA3;
+            --color-indicator: #EEEEEE;
+            --color-orange: #FF8500;
+            --color-red: #ed1c24;
+            --color-darker: #1b2430;
+
+            --menu-width: 60px;
+            --menu-width-open: 250px;
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            font-size: 16px;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            background-color: var(--color-background);
+            color: var(--color-text-primary);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-background); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+
+        /* Menu */
+        .menu {
+            width: var(--menu-width);
+            height: 100vh;
+            background: var(--color-darker);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        #menu-icon {
+            margin: 12px;
+            cursor: pointer;
+            fill: var(--color-text-secondary);
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .menu-container span {
+            display: flex;
+            align-items: center;
+            padding: 15px 12px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .menu-container span:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--color-text-primary);
+        }
+
+        .menu-container span svg {
+            max-width: 35px;
+            min-width: 35px;
+            margin-right: 20px;
+            fill: currentColor;
+        }
+
+        /* Content Area */
+        .content {
+            flex-grow: 1;
+            height: 100vh;
+            background: var(--color-background);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .panel {
+            display: none;
+            padding: 0;
+            min-height: 100%;
+            box-sizing: border-box;
+        }
+
+        #home { display: block; }
+
+        /* Headers */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: transparent; /* Or match Android header bg if different */
+        }
+
+        .title {
+            font-size: 16px; /* Android size */
+            color: var(--color-text-secondary);
+            font-weight: normal;
+        }
+
+        .big-title {
+            font-size: 30px;
+            font-weight: bold;
+            color: var(--color-text-primary);
+            margin: 20px 16px;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--color-text-secondary);
+            margin: 10px 16px;
+            display: block;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            padding: 8px 16px;
+            display: block;
+        }
+
+        /* Grid View */
+        #appview, #modsview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Android uses 3 columns */
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .app-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .app-card:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .app-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 15px;
+            margin-bottom: 8px;
+        }
+
+        .app-card span {
+            color: var(--color-text-primary);
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* Search Bar (Mods) */
+        .search-container {
+            background-color: #000000;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            flex-grow: 1;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #E0E0E0;
+        }
+
+        /* Settings List */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal (Bottom Sheet Style) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .app-details-modal {
+            position: fixed;
+            bottom: 0; /* Bottom sheet style */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px; /* Limit width on desktop */
+            max-height: 85vh;
+            background-color: var(--color-surface);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            color: var(--color-text-primary);
+            padding-bottom: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); }
+            to { transform: translate(-50%, 0); }
+        }
+
+        .indicator {
+            width: 40px;
+            height: 6px;
+            background-color: var(--color-indicator);
+            border-radius: 3px;
+            margin: 12px auto 18px auto;
+        }
+
+        .modal-content-row {
+            display: flex;
+            flex-direction: row;
+            padding: 0 20px;
+        }
+
+        #app_icon {
+            width: 100px;
+            height: 100px;
+            margin-right: 16px;
+            object-fit: contain;
+        }
+
+        .app-info-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+        }
+
+        #app_name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+        }
+
+        #app_description {
+            font-size: 14px;
+            color: #CCCCCC;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .details-row {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #AAAAAA;
+        }
+
+        .action-buttons {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .button {
+            width: 100%;
+            background-color: var(--color-red);
+            border-radius: 15px;
+            font-size: 18px;
+            color: white;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            transition: opacity 0.2s;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        .author-tag {
+            width: fit-content;
+            background-color: var(--color-orange);
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .switch:hover {
+            cursor: pointer;
+        }
+        .switch {
+            width: 40px;
+            height: 20px;
+            background: #555;
+            border-radius: 10px;
+            position: relative;
+
+            .switch-handle {
+                width: 16px;
+                height: 16px;
+                background: white;
+                border-radius: 50%;
+                position: absolute;
+                top: 2px;
+            }
+        }
+
+        .linkBtn {
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            padding: 10px;
+            background-color: #212121;
+            color: #555;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .linkBtn:hover {
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <svg id="menu-icon" width="35px" height="35px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <!-- Icon content set by JS -->
+        </svg>
+        <div class="menu-container">
+            <span onclick="switchPanel('home')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                Home
+            </span>
+            <span onclick="switchPanel('mods')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M430.184,194.351v-93.802c0-10.345-8.387-18.732-18.732-18.732h-97.561C305.091,35.294,264.136,0,215.091,0 c-49.043,0-89.998,35.294-98.799,81.818H18.732C8.387,81.818,0,90.204,0,100.549v110.786c0,10.345,8.387,18.732,18.732,18.732 c34.785,0,63.085,28.3,63.085,63.086s-28.3,63.085-63.085,63.085C8.387,356.237,0,364.624,0,374.969v118.299 C0,503.613,8.387,512,18.732,512h114.543c10.345,0,18.732-8.387,18.732-18.732c0-34.785,28.3-63.086,63.085-63.086 s63.086,28.3,63.086,63.086c0,10.345,8.387,18.732,18.732,18.732h114.543c10.345,0,18.732-8.387,18.732-18.732V391.951 c46.523-8.801,81.816-49.756,81.816-98.8C512,244.108,476.707,203.153,430.184,194.351z"/></svg>
+                Mods
+            </span>
+            <span onclick="switchPanel('authenticator')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.995 6.9a.998.998 0 0 0-.548-.795l-8-4a1 1 0 0 0-.895 0l-8 4a1.002 1.002 0 0 0-.547.795c-.011.107-.961 10.767 8.589 15.014a.987.987 0 0 0 .812 0c9.55-4.247 8.6-14.906 8.589-15.014zM12 19.897V12H5.51a15.473 15.473 0 0 1-.544-4.365L12 4.118V12h6.46c-.759 2.74-2.498 5.979-6.46 7.897z"/></svg>
+                Authenticator
+            </span>
+            <span onclick="switchPanel('4re5net')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 19c1.25-.03 2.44-.52 3.35-1.39.9-1.86 1.45-3.03 1.53-4.28.08-1.25-.31-2.48-1.09-3.45-.78-.98-1.9-1.62-3.14-1.81-.47-1.33-1.39-2.45-2.6-3.16-1.21-.71-2.64-.98-4.03-.75-1.39.23-2.65.94-3.57 2.01-.92 1.07-1.43 2.42-1.45 3.83-1.06 0-2.08.42-2.83 1.17-.75.75-1.17 1.77-1.17 2.83 0 1.06.42 2.08 1.17 2.83.75.75 1.77 1.17 2.83 1.17H17z"/></svg>
+                4re5net
+            </span>
+            <span onclick="switchPanel('settings')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84a.484.484 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.488.488 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                Settings
+            </span>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Home Fragment -->
+        <div class="panel" id="home">
+            <div class="header-bar">
+                <span class="title">4re5 apps</span>
+                <svg onclick="update()" style="cursor: pointer;" width="24px" height="24px" fill="none" stroke="var(--color-text-secondary)" viewBox="0 0 24 24" id="update">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            </div>
+            <div id="appview">
+                <!-- apps here -->
+            </div>
+        </div>
+
+        <!-- Mods Fragment -->
+        <div class="panel" id="mods">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="search mod">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </div>
+            <div class="header-bar">
+                <span class="title">Favorite Mods</span>
+            </div>
+            <div id="modsview">
+                <p style="padding: 16px; color: #888;">No mods found.</p>
+            </div>
+        </div>
+
+        <!-- Authenticator Fragment -->
+        <div class="panel" id="authenticator">
+            <div class="header-bar">
+                <span class="title">saved accounts</span>
+                <svg onclick="alert('soon')" width="35" height="35" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+            <div id="accountsview">
+                <p style="padding: 16px; color: #888;">No accounts saved.</p>
+            </div>
+        </div>
+
+        <!-- 4re5net Fragment -->
+        <div class="panel" id="4re5net">
+            <div class="header-bar">
+                <span class="title">4re5net</span>
+            </div>
+            <span class="subtitle">Select a server</span>
+            <div id="serversview">
+                <p style="padding: 16px; color: #888;">No servers available.</p>
+            </div>
+        </div>
+
+        <!-- Settings Fragment -->
+        <div class="panel" id="settings">
+            <span class="big-title">Settings</span>
+            <span class="section-title">General</span>
+            <div class="setting-item">
+                <span style="color: var(--color-text-secondary);">Developer Mode</span>
+                <!-- Simple switch representation -->
+                <div id="developer_switch" class="switch">
+                    <div class="switch-handle" style="left: 2px"></div>
+                </div>
+            </div>
+            <span class="section-title">About</span>
+            <div class="setting-item" style="flex-direction: column; display: flex;">
+                <p class="section-title" style="font-size: medium;">4re5-manager v<span id="settings_app_version">1.0</span></p>
+                <p class="section-title" style="font-size: medium;">credits: <span class="author-tag">@4re5 group</span></p>
+                <p class="section-title" style="font-size: medium;">Published under license: GNU GPL 3.0</p>
+                <br><br>
+                <div onclick="openLink('https://github.com/4RE5group/4re5-manager')"class="linkBtn">
+                    <span>Github Repo</span>
+                    <svg fill="#ffffff" width="30px" height="30px" viewBox="0 -0.5 25 25" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g><path d="m12.301 0h.093c2.242 0 4.34.613 6.137 1.68l-.055-.031c1.871 1.094 3.386 2.609 4.449 4.422l.031.058c1.04 1.769 1.654 3.896 1.654 6.166 0 5.406-3.483 10-8.327 11.658l-.087.026c-.063.02-.135.031-.209.031-.162 0-.312-.054-.433-.144l.002.001c-.128-.115-.208-.281-.208-.466 0-.005 0-.01 0-.014v.001q0-.048.008-1.226t.008-2.154c.007-.075.011-.161.011-.249 0-.792-.323-1.508-.844-2.025.618-.061 1.176-.163 1.718-.305l-.076.017c.573-.16 1.073-.373 1.537-.642l-.031.017c.508-.28.938-.636 1.292-1.058l.006-.007c.372-.476.663-1.036.84-1.645l.009-.035c.209-.683.329-1.468.329-2.281 0-.045 0-.091-.001-.136v.007c0-.022.001-.047.001-.072 0-1.248-.482-2.383-1.269-3.23l.003.003c.168-.44.265-.948.265-1.479 0-.649-.145-1.263-.404-1.814l.011.026c-.115-.022-.246-.035-.381-.035-.334 0-.649.078-.929.216l.012-.005c-.568.21-1.054.448-1.512.726l.038-.022-.609.384c-.922-.264-1.981-.416-3.075-.416s-2.153.152-3.157.436l.081-.02q-.256-.176-.681-.433c-.373-.214-.814-.421-1.272-.595l-.066-.022c-.293-.154-.64-.244-1.009-.244-.124 0-.246.01-.364.03l.013-.002c-.248.524-.393 1.139-.393 1.788 0 .531.097 1.04.275 1.509l-.01-.029c-.785.844-1.266 1.979-1.266 3.227 0 .025 0 .051.001.076v-.004c-.001.039-.001.084-.001.13 0 .809.12 1.591.344 2.327l-.015-.057c.189.643.476 1.202.85 1.693l-.009-.013c.354.435.782.793 1.267 1.062l.022.011c.432.252.933.465 1.46.614l.046.011c.466.125 1.024.227 1.595.284l.046.004c-.431.428-.718 1-.784 1.638l-.001.012c-.207.101-.448.183-.699.236l-.021.004c-.256.051-.549.08-.85.08-.022 0-.044 0-.066 0h.003c-.394-.008-.756-.136-1.055-.348l.006.004c-.371-.259-.671-.595-.881-.986l-.007-.015c-.198-.336-.459-.614-.768-.827l-.009-.006c-.225-.169-.49-.301-.776-.38l-.016-.004-.32-.048c-.023-.002-.05-.003-.077-.003-.14 0-.273.028-.394.077l.007-.003q-.128.072-.08.184c.039.086.087.16.145.225l-.001-.001c.061.072.13.135.205.19l.003.002.112.08c.283.148.516.354.693.603l.004.006c.191.237.359.505.494.792l.01.024.16.368c.135.402.38.738.7.981l.005.004c.3.234.662.402 1.057.478l.016.002c.33.064.714.104 1.106.112h.007c.045.002.097.002.15.002.261 0 .517-.021.767-.062l-.027.004.368-.064q0 .609.008 1.418t.008.873v.014c0 .185-.08.351-.208.466h-.001c-.119.089-.268.143-.431.143-.075 0-.147-.011-.214-.032l.005.001c-4.929-1.689-8.409-6.283-8.409-11.69 0-2.268.612-4.393 1.681-6.219l-.032.058c1.094-1.871 2.609-3.386 4.422-4.449l.058-.031c1.739-1.034 3.835-1.645 6.073-1.645h.098-.005zm-7.64 17.666q.048-.112-.112-.192-.16-.048-.208.032-.048.112.112.192.144.096.208-.032zm.497.545q.112-.08-.032-.256-.16-.144-.256-.048-.112.08.032.256.159.157.256.047zm.48.72q.144-.112 0-.304-.128-.208-.272-.096-.144.08 0 .288t.272.112zm.672.673q.128-.128-.064-.304-.192-.192-.32-.048-.144.128.064.304.192.192.32.044zm.913.4q.048-.176-.208-.256-.24-.064-.304.112t.208.24q.24.097.304-.096zm1.009.08q0-.208-.272-.176-.256 0-.256.176 0 .208.272.176.256.001.256-.175zm.929-.16q-.032-.176-.288-.144-.256.048-.224.24t.288.128.225-.224z"></path></g></svg>
+                </div>
+                <div onclick="openLink('https://paypal.me/4re5group')" class="linkBtn">
+                    <span>Support Us</span>
+                    <svg width="30px" height="30px" viewBox="-1.5 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff" stroke="#ffffff"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <title>paypal [#ffffff]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-222.000000, -7559.000000)" fill="#ffffff"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M182.475463,7404.9 C181.260804,7410.117 177.555645,7411 172.578656,7411 L171.078137,7419 L173.825411,7419 C174.325918,7419 174.53555,7418.659 174.627828,7418.179 C175.312891,7413.848 175.216601,7414.557 175.278788,7413.879 C175.337966,7413.501 175.664951,7413 176.049108,7413 C179.698098,7413 182.118387,7411.945 182.857614,7408.158 C183.120405,7406.811 183.034145,7405.772 182.475463,7404.9 M171.134306,7410.86 L170.011926,7417 L166.535456,7417 C166.206465,7417 165.954707,7416.598 166.006864,7416.274 L168.602682,7399.751 C168.670887,7399.319 169.045014,7399 169.484337,7399 L175.718111,7399 C179.409228,7399 181.894714,7400.401 181.319983,7404.054 C180.313953,7410.56 174.737157,7410 172.199514,7410 C171.760191,7410 171.203515,7410.428 171.134306,7410.86" id="paypal-[#ffffff]"> </path> </g> </g> </g> </g></svg>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- App Details Modal (Bottom Sheet Style) -->
+    <div class="modal-overlay" onclick="closeApp()"></div>
+    <div class="app-details-modal">
+        <div class="indicator"></div>
+        <div class="modal-content-row">
+            <img id="app_icon" src="">
+            <div class="app-info-col">
+                <p id="app_name">AppName</p>
+                <p id="app_description">Description goes here...</p>
+                <span id="app_author" class="author-tag">@author</span>
+            </div>
+        </div>
+        
+        <div class="details-row">
+            <span id="app_first_release">first release: 01-01-1970</span>
+            <span id="app_version">version: 1.0</span>
+        </div>
+        <div class="details-row">
+             <span id="app_license">License: MIT</span>
+             <svg id="app_github" width="24" height="24" viewBox="0 0 24 24" fill="white" style="cursor: pointer;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </div>
+
+        <div class="action-buttons">
+            <button class="button" id="app_install" onclick="install()">install</button>
+            <button class="button" id="app_uninstall" style="display: none;">uninstall</button>
+        </div>
+    </div>
+
+    <script>
+        // 4re5 group, all rights reserved
+        var icon_menu_close = `<g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g>  <g id="Layer_2" data-name="Layer 2"> <g id="invisible_box" data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g id="icons_Q2" data-name="icons Q2"> <path d="M26.8,24,37.4,13.5a2.1,2.1,0,0,0,.2-2.7,1.9,1.9,0,0,0-3-.2L24,21.2,13.4,10.6a1.9,1.9,0,0,0-3,.2,2.1,2.1,0,0,0,.2,2.7L21.2,24,10.6,34.5a2.1,2.1,0,0,0-.2,2.7,1.9,1.9,0,0,0,3,.2L24,26.8,34.6,37.4a1.9,1.9,0,0,0,3-.2,2.1,2.1,0,0,0-.2-2.7Z"></path> </g> </g> </g>`;
+        var icon_menu_open = `<g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <g data-name="Layer 2"> <g data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g data-name="icons Q2"> <g> <path d="M42,12a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,24a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> <path d="M42,36a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2H6a2,2,0,0,1,2-2H40a2,2,0,0,1,2,2Z"></path> </g> </g> </g> </g>`;
+
+        var menu_icon = document.getElementById("menu-icon");
+        var menu = document.querySelector(".menu");
+        var app_view = document.getElementById("appview");
+        var modal = document.querySelector(".app-details-modal");
+        var overlay = document.querySelector(".modal-overlay");
+
+        var repo = new Map(); // init repo map
+        var current_app; // current application
+        var defaultImage = "https://raw.githubusercontent.com/4RE5group/4re5-repository/refs/heads/main/default.png";
+
+        // init menu icon
+        menu_icon.innerHTML = icon_menu_open;
+
+        menu_icon.addEventListener("click", function () {
+            // if opened
+            if (menu.style.width == "var(--menu-width-open)")
+            {
+                menu.style.width = "var(--menu-width)";
+                menu_icon.innerHTML = icon_menu_open;
+            }
+            else // if closed
+            {
+                menu.style.width = "var(--menu-width-open)";
+                menu_icon.innerHTML = icon_menu_close;
+            }
+        });
+
+        var callStack = []; // map array of callbacks for message listeners
+        window.chrome.webview.addEventListener("message", (event) => {
+            var name = event.data.split(":")[0];
+            var message = event.data.replaceAll(name+":", "");
+            if (name == "log") // handle log message
+            {
+                console.log("4re5-manager: "+message);
+                return;
+            }
+            callStack.forEach(map => {
+                if (name == map.name)
+                {
+                    map.callback(message);
+                    const index = callStack.indexOf(map);
+                    if (index > -1) { // only splice array when item is found
+                        callStack.splice(index, 1);
+                    }
+                    return;
+                }
+            });
+        });
+
+        function awaitMessage(callback, func, ...args)
+        {
+            // append order of the message
+            callStack.push({
+                "name": func,
+                "callback": callback
+            });
+            if (typeof window.chrome.webview.hostObjects.aresAPI[func] === "function") {
+                window.chrome.webview.hostObjects.aresAPI[func](...args);
+            } else {
+                console.error(`Function ${func} does not exist.`);
+            }
+        }
+
+        // app view loader
+        window.addEventListener("load", function () {
+            // load apps
+            var apps;
+            awaitMessage(result => {
+                apps = JSON.parse(result);
+                LoadApps(apps);
+                document.getElementById("developer_switch").addEventListener("click", (event) => switch_toggle(event.currentTarget));
+            
+                let manager_json = null;
+                apps.forEach(app => {
+                    if (app.package === "com.ares")
+                    {
+                        app.platform.forEach(platform => {
+                            if (platform.platform.includes("windows"))
+                                manager_json = JSON.stringify(platform);
+                        });
+                    }
+                });
+                // check if manager is not installed
+                awaitMessage(result => {
+                    if (result === "-1.0" && manager_json != null) {
+                        awaitMessage(result2 => {
+                            console.log(result2);
+                        }, "Install", manager_json);
+                        console.log(manager_json);
+                    }
+                }, "GetPackageVersion", "com.ares");
+            }, "GetRepo", false);
+
+            // store current app version
+            awaitMessage(result => {
+                document.getElementById("settings_app_version").innerText = result;
+            }, "GetManagerVersion");
+        });
+
+
+        function closeApp() {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        }
+
+        function switchPanel(id) {
+            document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            
+            // Close menu if open
+            if (menu.style.width == "var(--menu-width-open)") {
+                menu.style.width = "var(--menu-width)";
+                menu_icon.innerHTML = icon_menu_open;
+            }
+        }
+
+        function LoadApps(json) {
+            app_view.innerHTML = "";
+            repo = json;
+            repo.forEach(app => {
+                if (app.disabled)
+                    return;
+
+                app_view.innerHTML += `
+                <div class="app-card" onclick="viewApp('${app.package}')">
+                    <img src="${(app.image == "")?defaultImage:app.image}">
+                    <span>${app.name}</span>
+                </div>`;
+            }); 
+        }
+
+        function update()
+        {
+            var icon = document.getElementById("update");
+            icon.classList.add("spin");
+            awaitMessage(result => {
+                LoadApps(JSON.parse(result));
+                icon.classList.remove("spin");
+            }, "GetRepo", true);
+        }
+
+        function showConfirm(title, message, onConfirm) {
+            if (confirm(message)) {
+                onConfirm();
+            }
+        }
+
+        function install()
+        {
+            if (current_app == null) {
+                console.error("an error occured: current_app is null");
+                return;
+            }
+            var installBtn = document.getElementById("app_install");
+            
+            awaitMessage(result => {
+                if (result == "downloaded") {
+                    installBtn.innerText = "install";
+                    alert("Download complete. Click install to run the installer.");
+                } else if (result == "success") {
+                    alert("Installation successful!");
+                    viewApp(current_app.package);
+                } else {
+                    alert(result);
+                    viewApp(current_app.package);
+                }
+            }, "Install", JSON.stringify(current_app));
+        }
+
+        function uninstall()
+        {
+            if (current_app == null) {
+                console.error("an error occured: current_app is null");
+                return;
+            }
+            showConfirm("Uninstall App", "Are you sure you want to uninstall " + current_app.name + "?", () => {
+                awaitMessage(result => {
+                    alert(result);
+                    viewApp(current_app.package); // refresh view
+                }, "Uninstall", current_app.package);
+            });
+        }
+
+        function viewApp(package)
+        {
+            // find map that has this package name in repo
+            current_app = null;
+            repo.forEach(elem => {
+                if (elem.package == package)
+                {
+                    current_app = elem;
+                    return;
+                }
+            });
+            if (current_app == null)
+                return;
+            let version = "not available for windows yet";
+            let platform;
+            current_app.platform.forEach(p => {
+                if (p.platform == "windows") {
+                    platform = p;
+                    version = "version: "+platform.version;
+                }
+            });
+            document.getElementById("app_icon").src = (current_app.image == "")?defaultImage:current_app.image;
+            document.getElementById("app_name").innerText = current_app.name;
+            document.getElementById("app_description").innerText = current_app.description;
+            document.getElementById("app_github").onclick = () => {
+                openLink(current_app.github);
+            };
+            document.getElementById("app_author").innerText = "@"+current_app.author;
+            document.getElementById("app_author").onclick = () => {
+                openLink("https://github.com/"+current_app.author.replaceAll(" ", ""));
+            };
+            document.getElementById("app_first_release").innerText = "first release: "+current_app.first_date;
+            document.getElementById("app_version").innerText = version;
+            document.getElementById("app_license").innerText = "License: " + current_app.license;
+
+            // check if installed
+            awaitMessage(current_version => {
+                var uninstallBtn = document.getElementById("app_uninstall");
+                var installBtn = document.getElementById("app_install");
+
+                if (typeof platform === 'undefined') {
+                    installBtn.style.display = "none";
+                    uninstallBtn.style.display = "none";
+                } else {
+                    installBtn.style.display = "block";
+                    if (parseFloat(current_version) == -1.0) // if not installed
+                    {
+                        installBtn.onclick = () => {
+                            install();
+                        };
+                        if (platform.artifactType == "exe" || platform.artifactType == "msi")
+                            installBtn.innerText = "download";
+                        else
+                            installBtn.innerText = "install";
+
+                        uninstallBtn.style.display = "none";
+                    }
+                    else
+                    {
+                        uninstallBtn.style.display = "block";
+                        uninstallBtn.onclick = () => {
+                            uninstall();
+                        };
+
+                        let float_last_version = platform.version.replace(".", "#");
+                        float_last_version = float_last_version.replaceAll(".", "");
+                        float_last_version = parseFloat(float_last_version.replace("#", "."));
+                        if (float_last_version > parseFloat(current_version))
+                        {
+                            installBtn.innerText = "update";
+                            installBtn.onclick = () => {
+                                install();
+                            };
+                        }
+                        else
+                        {
+                            installBtn.innerText = "launch";
+                            installBtn.onclick = () => {
+                                launch(current_app.package);
+                            };
+                        }
+                    }
+                }
+                modal.style.display = "flex";
+                overlay.style.display = "block";
+            }, "GetPackageVersion", current_app.package);
+        }
+        function openLink(link)
+        {
+            awaitMessage(result => {
+                console.log("openLink: "+result);
+            }, "openLink", link);
+        }
+        function launch(package)
+        {
+            awaitMessage(result => {
+                console.log("launching status: "+result);
+            }, "launchPackage", package);
+        }
+        function is_checked(target_handle)
+        {
+            return (target_handle.style.left == "");
+        }
+        function switch_toggle(target)
+        {
+            let target_handle = target.querySelector(".switch-handle");
+            if (!target_handle) return;
+
+            if (!is_checked(target_handle))
+            {
+                target_handle.style.right = target_handle.style.left;
+                target_handle.style.left = "";
+            } else {
+                target_handle.style.left = target_handle.style.right;
+                target_handle.style.right = "";
+            }
+        }
+    </script>
+</body>
+</html>

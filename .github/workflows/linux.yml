@@ -1,0 +1,19 @@
+name: Linux Version
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: dependencies installation
+      run: cd src/linux/ && make deps
+    - name: make
+      run: cd src/linux/ && make -j 8
