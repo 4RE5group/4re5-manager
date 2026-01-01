@@ -7,13 +7,17 @@
 Official 4re5 app downloader &amp; updater with 4re5 security features for authentification and more
 
 ## Installation
+### Windows
+1. Download the [installer](https://github.com/4RE5group/4re5-manager/releases/latest/download/release_windows.apk)
+2. Install with admin rights
+
 ### Android
-1. Download [apk file](https://github.com/4RE5group/4re5-manager/releases/latest/download/release.apk)
+1. Download the latest [apk file](https://github.com/4RE5group/4re5-manager/releases/latest/download/release_android.apk)
 2. Install apk from an apk installer
  
 ### Linux (Debian based operating systems)
 ```
-wget https://github.com/4RE5group/4re5-manager/releases/latest/download/release.deb
+wget https://github.com/4RE5group/4re5-manager/releases/latest/download/release_linux.deb
 sudo dpkg -i release.deb
 ```
 
